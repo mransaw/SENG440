@@ -3,7 +3,7 @@
 #include <math.h>
 
 // assuming input and output are both N-bit signed integers
-#define N_BITS 12
+#define N_BITS 14
 
 int main(void) {
     // calculate points of theta for linear approximation
@@ -26,6 +26,9 @@ int main(void) {
         printf("Enter theta: ");
         scanf("%d", &theta);
         
+        // scale theta
+        theta = theta * y_int / M_PI;
+        
         if (theta < points[1]) {
             printf("Theta is less than: %d\n", points[1]);
             result = -slope * theta - y_int;
@@ -37,7 +40,7 @@ int main(void) {
             result = -slope * theta + y_int;
         } else {
             printf("WARNING: theta must be between -pi and pi\n");
-            result = 0;
+            return -1;
         }
         
         printf("Result is: %d\n\n", result);
