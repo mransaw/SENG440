@@ -1,7 +1,7 @@
 #include "arctan.h"
 #include <math.h>
 #include <stdio.h>
-int main(int argc, char * argv[]) {
+int main(void) {
     int x;
     double UPPER_BOUND = (double)pow(2, N_BITS - 1);
 
