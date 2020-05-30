@@ -10,30 +10,35 @@ typedef struct svd {
     int** V;
 } SVD;
 
-void initMatrix(int** matrix) {
+void initIdentityMatrix(int** matrix) {
     for (int i = 0; i < M; ++i) {
         matrix[i] = (int*)malloc(sizeof(int*) * M);
     }
-
+    int value;
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
-            matrix[i][j] = 0;
+            if (i == j) {
+                value = 1;
+            } else {
+                value = 0;
+            }
+            matrix[i][j] = value;
         }
     }
 }
 
-SVD diagonalize(int matrix[M][M]) {
+SVD diagonalize(int** matrix) {
     SVD svd;
     
     int** U = (int**)malloc(sizeof(int**) * M);
-    int** S = (int**)malloc(sizeof(int**) * M);
+    int** S = matrix;
     int** V = (int**)malloc(sizeof(int**) * M);
 
     // stubbed out: initialize U, S, and V to zero matrices
     // TODO: implement Jacobi method to find values for U, S, and V
-    initMatrix(U);
-    initMatrix(S);
-    initMatrix(V);
+    initIdentityMatrix(U);
+
+    initIdentityMatrix(V);
 
     svd.U = U;
     svd.S = S;
@@ -55,7 +60,10 @@ void printout(const char * matrixName, int** matrix) {
 
 int main(void) {
     int max_val = pow(2, N_BITS);
-    int matrix[M][M];
+    int** matrix;
+    for (int i = 0; i < M; ++i) {
+        matrix[i] = (int*)malloc(sizeof(int*) * M);
+    }
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
             matrix[i][j] = rand() % max_val;
