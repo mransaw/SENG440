@@ -1,4 +1,4 @@
-#include <arctan.h>
+#include <linear_approx.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -28,14 +28,20 @@ void initIdentityMatrix(int** matrix) {
 }
 
 void matmul(int** m1, int** m2, int** dest) {
-    // apply matrix multiplication m1 x m2, and store the resulting matrix in dest
+    // TODO: apply matrix multiplication m1 x m2, and store the resulting matrix in dest
+    initIdentityMatrix(dest);
+}
+
+void transpose(int** source, int** dest) {
+    // TODO: implement
+    initIdentityMatrix(dest);
 }
 
 void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
-    int cos_l = cos(theta_l);
-    int sin_l = sin(theta_l);
-    int cos_r = cos(theta_r);
-    int sin_r = sin(theta_r);
+    int cos_l = lin_cos(theta_l);
+    int sin_l = lin_sin(theta_l);
+    int cos_r = lin_cos(theta_r);
+    int sin_r = lin_sin(theta_r);
 
     int** _U = (int**)malloc(sizeof(int**) * M);
     int** _V = (int**)malloc(sizeof(int**) * M);
@@ -52,9 +58,12 @@ void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
     _V[j][i] = -1 * sin_r;
     _V[i][j] = cos_r;
 
-    int** _U_t = transpose(_U);
-    int** _V_t = transpose(_V);
-    int** V_t = transpose(svd.V);
+    int** _U_t = (int**)malloc(sizeof(int**));
+    transpose(_U, _U_t);
+    int** _V_t = (int**)malloc(sizeof(int**));
+    transpose(_V, _V_t);
+    int** V_t = (int**)malloc(sizeof(int**));
+    transpose(svd.V, V_t);
 
 
     int** U = (int**)malloc(sizeof(int**) * M);
@@ -147,10 +156,10 @@ int main(void) {
         }
     }
 
-    SVD svd = diagonalize(matrix);
-    printout("U", svd.U);
-    printout("S", svd.S);
-    printout("V", svd.V);
+   SVD svd = diagonalize(matrix);
+   printout("U", svd.U);
+   printout("S", svd.S);
+   printout("V", svd.V);
 
     return 0;
 }

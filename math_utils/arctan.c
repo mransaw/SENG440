@@ -1,5 +1,5 @@
 
-#include "arctan.h"
+#include "linear_approx.h"
 #include <math.h>
 
 int arctan(int x) {
