@@ -35,20 +35,20 @@ int dotProduct(int* v1, int* v2) {
     return sum;
 }
 
+void transpose(int** source, int** dest) {
+    for (int row = 0; row < M; ++row) {
+        for (int col = 0; col < M; ++col) {
+            dest[row][col] = source[col][row];
+        }
+    }
+}
+
 void matmul(int** m1, int** m2, int** dest) {
     int** m2_t = (int**)malloc(sizeof(int**));
     transpose(m2, m2_t);
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
             dest[i][j] = dotProduct(m1[i], m2_t[j]);
-        }
-    }
-}
-
-void transpose(int** source, int** dest) {
-    for (int row = 0; row < M; ++row) {
-        for (int col = 0; col < M; ++col) {
-            dest[row][col] = source[col][row];
         }
     }
 }
