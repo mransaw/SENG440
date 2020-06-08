@@ -4,27 +4,25 @@
 #include <linear_approx.h>
 
 int lin_sin(int theta) {
-    // calculate points of theta for linear approximation
-    int points[3] = {-pow(2,N_BITS-1), 0, pow(2,N_BITS-1)-1};
+    int t_theta, result;    
     
-    // calculate slopes of lines
-    int slope = 1;
+    // truncate theta (assumes an input scale factor of (2^31)/pi
+    t_theta = (theta>>16);
     
-    // use if N bits output not equal to N bits input
-    //int slope = (N_BITS_OUT) / (N_BITS_IN); 
+    // magnitude of slopes is 2/pi, scaled
+    int slope = (1<<16));
+    printf("slope = %d\n", slope);
     
-    // calculate y-intercepts of lines
-    int y_int = pow(2,N_BITS-2);
-   
-    int result;
+    // magnitude of y-intercepts is 1, scaled
+    int y_int = (1<<30);
+    printf("y-int = %d\n", y_int);
     
-    if (theta < points[1]) {
+    if (theta < 0) {
         result = slope * theta + y_int;
-    } else if (theta < points[2]) {
-        result = -slope * theta + y_int;
     } else {
-        assert(0);
+        result = -slope * theta + y_int;
     }
     
+    // output scale factor is 2^30
     return result;
 }

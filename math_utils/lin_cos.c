@@ -4,33 +4,31 @@
 #include <linear_approx.h>
 
 int lin_cos(int theta) {
-    // calculate points of theta for linear approximation
-    int points[4] = {-pow(2,N_BITS-1), -pow(2,N_BITS-2), pow(2,N_BITS-2), pow(2,N_BITS-1)-1};
+    int t_theta, result;    
+    
+    // truncate theta (assumes an input scale factor of (2^31)/pi
+    t_theta = (theta>>16);
+    printf("truncated theta = %d\n", t_theta);
 
-    printf("points[3] = %d\n", points[3]);
-    printf("theta = %d\n", theta);
+    // calculate bounds for theta
+    int points[2] = {-(1<<14), (1<<14)};
     
-    // calculate slopes of lines
-    int slope = 1;
+    // magnitude of slopes is 2/pi, scaled
+    int slope = (1<<16));
+    printf("slope = %d\n", slope);
     
-    // use if N bits output not equal to N bits input
-    //int slope = (N_BITS_OUT) / (N_BITS_IN); 
+    // magnitude of y-intercepts is 2, scaled
+    int y_int = (2<<30)-1;
+    printf("y-int = %d\n", y_int);
     
-    // calculate y-intercepts of lines
-    int y_int = pow(2,N_BITS-1);
-   
-    int result;
-    
-    if (theta < points[1]) {
-        result = -slope * theta - y_int;
-    } else if (theta < points[2]) {
-        result = slope * theta;
-    } else if (theta <= points[3]) {
-        result = -slope * theta + y_int;
+    if (theta < points[0]) {
+        result = -slope * t_theta - y_int;
+    } else if (theta < points[1]) {
+        result = slope * t_theta;
     } else {
-        printf("fail\n");
-        assert(0);
+        result = -slope * t_theta + y_int;
     }
     
+    // output scale factor is 2^30
     return result;
 }
