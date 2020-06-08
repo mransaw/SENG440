@@ -16,7 +16,7 @@ int lin_cos(int theta) {
     int slope = (1<<16);
 
     // magnitude of y-intercepts is 2, scaled
-    int y_int = 7FFFFFFF;
+    int y_int = 0x7FFFFFFF;
     
     if (theta < points[0]) {
         result = -slope * t_theta - y_int;
