@@ -14,7 +14,7 @@ int lin_cos(int theta) {
     int points[2] = {-(1<<14), (1<<14)};
     
     // magnitude of slopes is 2/pi, scaled
-    int slope = (1<<16));
+    int slope = (1<<16);
     printf("slope = %d\n", slope);
     
     // magnitude of y-intercepts is 2, scaled

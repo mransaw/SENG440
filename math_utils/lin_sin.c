@@ -10,7 +10,7 @@ int lin_sin(int theta) {
     t_theta = (theta>>16);
     
     // magnitude of slopes is 2/pi, scaled
-    int slope = (1<<16));
+    int slope = (1<<16);
     printf("slope = %d\n", slope);
     
     // magnitude of y-intercepts is 1, scaled
