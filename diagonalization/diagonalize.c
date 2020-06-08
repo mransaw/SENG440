@@ -51,15 +51,12 @@ void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
 
     printf("theta_r: %d\n", theta_r);
 
-    printf("trace1\n");
     int cos_l = lin_cos(theta_l);
-    printf("trace2\n");
     int sin_l = lin_sin(theta_l);
-    printf("trace3\n");
     int cos_r = lin_cos(theta_r);
-    printf("trace4\n");
     int sin_r = lin_sin(theta_r);
-    printf("trace5\n");
+
+    printf("trace\n");
 
     int** _U = (int**)malloc(sizeof(int**) * M);
     int** _V = (int**)malloc(sizeof(int**) * M);
