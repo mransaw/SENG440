@@ -3,6 +3,7 @@
 #include <math.h>
 
 int arctan(int x) {
+    printf("%d\n", x);
     int UPPER_BOUND = pow(2, N_BITS - 1);
     int MIDDLE_BOUND = pow(2, N_BITS - 2);
     int OUTER_BOUNDS_SLOPE = ceil(0.644 * ((double)UPPER_BOUND));
@@ -17,5 +18,6 @@ int arctan(int x) {
     } else {
         result = (OUTER_BOUNDS_SLOPE * x) - OUTER_BOUNDS_INTERCEPT;
     }
+    printf("   %d\n", result);
     return result;
 }

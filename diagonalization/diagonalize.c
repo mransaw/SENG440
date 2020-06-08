@@ -1,14 +1,8 @@
+#include "diagonalize.h"
 #include <linear_approx.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#define M 6
-
-typedef struct svd_struct {
-    int** U;
-    int** S;
-    int** V;
-} SVD;
 
 void initIdentityMatrix(int** matrix) {
     for (int i = 0; i < M; ++i) {
@@ -54,10 +48,18 @@ void matmul(int** m1, int** m2, int** dest) {
 }
 
 void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
+
+    printf("theta_r: %d\n", theta_r);
+
+    printf("trace1\n");
     int cos_l = lin_cos(theta_l);
+    printf("trace2\n");
     int sin_l = lin_sin(theta_l);
+    printf("trace3\n");
     int cos_r = lin_cos(theta_r);
+    printf("trace4\n");
     int sin_r = lin_sin(theta_r);
+    printf("trace5\n");
 
     int** _U = (int**)malloc(sizeof(int**) * M);
     int** _V = (int**)malloc(sizeof(int**) * M);
@@ -158,24 +160,4 @@ void printout(const char * matrixName, int** matrix) {
         }
         printf("\n");
     }
-}
-
-int main(void) {
-    int max_val = pow(2, N_BITS);
-    int** matrix;
-    for (int i = 0; i < M; ++i) {
-        matrix[i] = (int*)malloc(sizeof(int*) * M);
-    }
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < M; ++j) {
-            matrix[i][j] = rand() % max_val;
-        }
-    }
-
-   SVD svd = diagonalize(matrix);
-   printout("U", svd.U);
-   printout("S", svd.S);
-   printout("V", svd.V);
-
-    return 0;
 }

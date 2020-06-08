@@ -6,6 +6,9 @@
 int lin_cos(int theta) {
     // calculate points of theta for linear approximation
     int points[4] = {-pow(2,N_BITS-1), -pow(2,N_BITS-2), pow(2,N_BITS-2), pow(2,N_BITS-1)-1};
+
+    printf("points[3] = %d\n", points[3]);
+    printf("theta = %d\n", theta);
     
     // calculate slopes of lines
     int slope = 1;
@@ -25,6 +28,7 @@ int lin_cos(int theta) {
     } else if (theta <= points[3]) {
         result = -slope * theta + y_int;
     } else {
+        printf("fail\n");
         assert(0);
     }
     
