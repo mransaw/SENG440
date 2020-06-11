@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
-#include <linear_approx.h>
+#include "linear_approx.h"
 
 int lin_cos(int theta) {
     int t_theta, result;    

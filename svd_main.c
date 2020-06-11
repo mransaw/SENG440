@@ -6,21 +6,32 @@
 #include <stdio.h>
 
 int main(void) {
+    //double result = arctan((49.974+72.829)/(33.248-44.157));
+    //result = arctan(151);
+    //printf("%f\n", result);
+    //result = arctan((49.974-72.829)/(33.248+44.157));
+    //printf("%f\n", result);
     int max_val = pow(2, N_BITS);
-    int** matrix;
+    int input[M][M] = {
+        {31, 77, -11, 26},
+        {-42, 14, 79, -53},
+        {-68, -10, 45, 90},
+        {34, 16, 38, -19}
+    };
+    int** matrix = (int**)malloc(sizeof(int**) * M);
     for (int i = 0; i < M; ++i) {
         matrix[i] = (int*)malloc(sizeof(int*) * M);
     }
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
-            matrix[i][j] = rand() % max_val;
+            matrix[i][j] = input[i][j];
         }
     }
 
-   SVD svd = diagonalize(matrix);
-   printout("U", svd.U);
-   printout("S", svd.S);
-   printout("V", svd.V);
+    printout("input matrix", matrix);
+    printf("\n");
+    SVD svd = diagonalize(matrix);
+    printoutSVD(svd);
 
     return 0;
 }

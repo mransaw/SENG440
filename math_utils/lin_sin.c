@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
-#include <linear_approx.h>
+#include "linear_approx.h"
 
 int lin_sin(int theta) {
     int t_theta, result;    

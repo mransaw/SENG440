@@ -38,7 +38,8 @@ void transpose(int** source, int** dest) {
 }
 
 void matmul(int** m1, int** m2, int** dest) {
-    int** m2_t = (int**)malloc(sizeof(int**));
+    int** m2_t = (int**)malloc(sizeof(int**) * M);
+    initIdentityMatrix(m2_t);
     transpose(m2, m2_t);
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
@@ -47,16 +48,18 @@ void matmul(int** m1, int** m2, int** dest) {
     }
 }
 
-void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
+void applyRotations(SVD svd, int i, int j, double theta_l, double theta_r) {
 
-    printf("theta_r: %d\n", theta_r);
 
-    int cos_l = lin_cos(theta_l);
-    int sin_l = lin_sin(theta_l);
-    int cos_r = lin_cos(theta_r);
-    int sin_r = lin_sin(theta_r);
+    double cos_l = cos(theta_l); //lin_cos(theta_l);
+    double sin_l = sin(theta_l); //lin_sin(theta_l);
+    double cos_r = cos(theta_r); //lin_cos(theta_r);
+    double sin_r = sin(theta_r); //lin_sin(theta_r);
 
-    printf("trace\n");
+    printf("sin_r: %f\n", sin_r);
+    printf("cos_r: %f\n", cos_r);
+    printf("sin_l: %f\n", sin_l);
+    printf("cos_l: %f\n", cos_l);
 
     int** _U = (int**)malloc(sizeof(int**) * M);
     int** _V = (int**)malloc(sizeof(int**) * M);
@@ -73,50 +76,70 @@ void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
     _V[j][i] = -1 * sin_r;
     _V[i][j] = cos_r;
 
-    int** _U_t = (int**)malloc(sizeof(int**));
+    int** _U_t = (int**)malloc(sizeof(int**) * M);
+    initIdentityMatrix(_U_t);
     transpose(_U, _U_t);
-    int** _V_t = (int**)malloc(sizeof(int**));
-    transpose(_V, _V_t);
-    int** V_t = (int**)malloc(sizeof(int**));
-    transpose(svd.V, V_t);
 
+    int** _V_t = (int**)malloc(sizeof(int**) * M);
+    initIdentityMatrix(_V_t);
+    transpose(_V, _V_t);
+
+
+    int** V_t = (int**)malloc(sizeof(int**) * M);
+    initIdentityMatrix(V_t);
+    transpose(*svd.V, V_t);
 
     int** U = (int**)malloc(sizeof(int**) * M);
     int** S = (int**)malloc(sizeof(int**) * M);
     int** S_ = (int**)malloc(sizeof(int**) * M);
     int** V = (int**)malloc(sizeof(int**) * M);
-    
-    matmul(svd.U, _U_t, U);
 
-    matmul(_U, svd.S, S_);
+    initIdentityMatrix(U);
+    initIdentityMatrix(S);
+    initIdentityMatrix(S_);
+    initIdentityMatrix(V);
+
+    matmul(*svd.U, _U_t, U);
+    matmul(_U, *svd.S, S_);
     matmul(S_, _V_t, S);
-
     matmul(_V, V_t, V);
 
-    svd.U = U;
-    svd.S = S;
-    svd.V = V;
+    svd.U = &U;
+    svd.S = &S;
+    svd.V = &V;
+    printoutSVD(svd);
 }
 
 void applyJacobiMethod(SVD svd, int i, int j) {
-        int m_ji = svd.S[j][i];
-        int m_ij = svd.S[i][j];
-        int m_ii = svd.S[i][i];
-        int m_jj = svd.S[j][j];
+        int m_ji = (*svd.S)[j][i];
+        int m_ij = (*svd.S)[i][j];
+        int m_ii = (*svd.S)[i][i];
+        int m_jj = (*svd.S)[j][j];
 
-        int X_sum = (m_ji + m_ij)/(m_jj - m_ii);
-        int X_diff = (m_ji - m_ji)/(m_jj + m_ii);
+        printf("Jacobi input:\n    %d  %d\n    %d  %d\n", m_ii, m_ij, m_ji, m_jj);
 
-        int theta_sum = arctan(X_sum);
-        int theta_diff = arctan(X_diff);
-        int theta_r = theta_sum + theta_diff;
-        int theta_l = theta_sum - theta_r;
+        double X_sum = ((double)(m_ji + m_ij))/((double)(m_jj - m_ii));
+        double X_diff = ((double)(m_ji - m_ij))/((double)(m_jj + m_ii));
+
+        printf("X_sum = %f\n", X_sum);
+        printf("X_diff = %f\n", X_diff);
+
+        double theta_sum = atan(X_sum); //arctan(X_sum);
+        double theta_diff = atan(X_diff); //arctan(X_diff);
+
+        printf("theta_sum = %f\n", theta_sum);
+        printf("theta_diff = %f\n", theta_diff);
+
+        double theta_r = 0.5*(theta_sum + theta_diff);
+        double theta_l = theta_sum - theta_r;
+
+        printf("theta_r = %f\n", theta_r);
+        printf("theta_l = %f\n", theta_l);
 
         applyRotations(svd, i, j, theta_l, theta_r);
 }
 
 void sweep(int row, int col, SVD svd) {
-    int** S = svd.S;
     if (col == M) {
         return;
     } else {
@@ -139,9 +162,9 @@ SVD diagonalize(int** matrix) {
     initIdentityMatrix(U);
     initIdentityMatrix(V);
 
-    svd.U = U;
-    svd.S = S;
-    svd.V = V;
+    svd.U = &U;
+    svd.S = &S;
+    svd.V = &V;
 
     startSweeps(svd);
 
@@ -157,4 +180,12 @@ void printout(const char * matrixName, int** matrix) {
         }
         printf("\n");
     }
+}
+
+void printoutSVD(const SVD svd) {
+    printf("=============================\n");
+    printout("U", *svd.U);
+    printout("S", *svd.S);
+    printout("V", *svd.V);
+    printf("=============================\n");
 }
