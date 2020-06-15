@@ -18,9 +18,9 @@ int lin_sin(int theta) {
     // magnitude of y-intercepts is 2, scaled
     int y_int = 0x7FFFFFFF;
     
-    if (theta < points[0]) {
+    if (t_theta < points[0]) {
         result = -slope * t_theta - y_int;
-    } else if (theta < points[1]) {
+    } else if (t_theta < points[1]) {
         result = slope * t_theta;
     } else {
         result = -slope * t_theta + y_int;

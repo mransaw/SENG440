@@ -15,10 +15,10 @@ int lin_cos(int theta) {
     // magnitude of y-intercepts is 1, scaled
     int y_int = (1<<30);
     
-    if (theta < 0) {
-        result = slope * theta + y_int;
+    if (t_theta < 0) {
+        result = slope * t_theta + y_int;
     } else {
-        result = -slope * theta + y_int;
+        result = -slope * t_theta + y_int;
     }
     
     // output scale factor is 2^30
