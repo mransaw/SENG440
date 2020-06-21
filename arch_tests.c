@@ -3,14 +3,10 @@
 
 int main(void) {
     char* method;
-    int32_t result = 5000/3;
-    if (result == 1667) {
-        method = "round to nearest LSB";
-    } else {
-        method = "truncate";
-    }
+    int32_t result;
+    float fresult = 5000.0/3.0;
         
-    printf("Rounding method: %s (%d)\n", method, result);
+    printf("Rounding method: 5000 / 3 = (%f)\n", method, fresult);
     
     int edge = 0x7FFFFFFF;
     result = edge + 0xFFFF;
