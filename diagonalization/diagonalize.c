@@ -4,9 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 
-void initIdentityMatrix(int** matrix) {
+void initIdentityMatrix(double** matrix) {
     for (int i = 0; i < M; ++i) {
-        matrix[i] = (int*)malloc(sizeof(int*) * M);
+        matrix[i] = (double*)malloc(sizeof(double*) * M);
     }
     int value;
     for (int i = 0; i < M; ++i) {
@@ -21,7 +21,7 @@ void initIdentityMatrix(int** matrix) {
     }
 }
 
-int dotProduct(int* v1, int* v2) {
+double dotProduct(double* v1, double* v2) {
     int sum = 0;
     for (int i = 0; i < M; ++i) {
         sum += v1[i] * v2[i];
@@ -29,7 +29,7 @@ int dotProduct(int* v1, int* v2) {
     return sum;
 }
 
-void transpose(int** source, int** dest) {
+void transpose(double** source, double** dest) {
     for (int row = 0; row < M; ++row) {
         for (int col = 0; col < M; ++col) {
             dest[row][col] = source[col][row];
@@ -37,8 +37,8 @@ void transpose(int** source, int** dest) {
     }
 }
 
-void matmul(int** m1, int** m2, int** dest) {
-    int** m2_t = (int**)malloc(sizeof(int**) * M);
+void matmul(double** m1, double** m2, double** dest) {
+    double** m2_t = (double**)malloc(sizeof(double**) * M);
     initIdentityMatrix(m2_t);
     transpose(m2, m2_t);
     for (int i = 0; i < M; ++i) {
@@ -61,8 +61,8 @@ void applyRotations(SVD svd, int i, int j, double theta_l, double theta_r) {
     printf("sin_l: %f\n", sin_l);
     printf("cos_l: %f\n", cos_l);
 
-    int** _U = (int**)malloc(sizeof(int**) * M);
-    int** _V = (int**)malloc(sizeof(int**) * M);
+    double** _U = (double**)malloc(sizeof(double**) * M);
+    double** _V = (double**)malloc(sizeof(double**) * M);
     initIdentityMatrix(_U);
     initIdentityMatrix(_V);
 
@@ -76,23 +76,23 @@ void applyRotations(SVD svd, int i, int j, double theta_l, double theta_r) {
     _V[j][i] = -1 * sin_r;
     _V[i][j] = cos_r;
 
-    int** _U_t = (int**)malloc(sizeof(int**) * M);
+    double** _U_t = (double**)malloc(sizeof(double**) * M);
     initIdentityMatrix(_U_t);
     transpose(_U, _U_t);
 
-    int** _V_t = (int**)malloc(sizeof(int**) * M);
+    double** _V_t = (double**)malloc(sizeof(double**) * M);
     initIdentityMatrix(_V_t);
     transpose(_V, _V_t);
 
 
-    int** V_t = (int**)malloc(sizeof(int**) * M);
+    double** V_t = (double**)malloc(sizeof(double**) * M);
     initIdentityMatrix(V_t);
     transpose(*svd.V, V_t);
 
-    int** U = (int**)malloc(sizeof(int**) * M);
-    int** S = (int**)malloc(sizeof(int**) * M);
-    int** S_ = (int**)malloc(sizeof(int**) * M);
-    int** V = (int**)malloc(sizeof(int**) * M);
+    double** U = (double**)malloc(sizeof(double**) * M);
+    double** S = (double**)malloc(sizeof(double**) * M);
+    double** S_ = (double**)malloc(sizeof(double**) * M);
+    double** V = (double**)malloc(sizeof(double**) * M);
 
     initIdentityMatrix(U);
     initIdentityMatrix(S);
@@ -152,12 +152,12 @@ void startSweeps(SVD svd) {
     sweep(0, 1, svd);
 }
 
-SVD diagonalize(int** matrix) {
+SVD diagonalize(double** matrix) {
     SVD svd;
     
-    int** U = (int**)malloc(sizeof(int**) * M);
-    int** S = matrix;
-    int** V = (int**)malloc(sizeof(int**) * M);
+    double** U = (double**)malloc(sizeof(double**) * M);
+    double** S = matrix;
+    double** V = (double**)malloc(sizeof(double**) * M);
 
     initIdentityMatrix(U);
     initIdentityMatrix(V);
@@ -171,12 +171,12 @@ SVD diagonalize(int** matrix) {
     return svd;
 }
 
-void printout(const char * matrixName, int** matrix) {
+void printout(const char * matrixName, double** matrix) {
     printf("----------------------------------\n");
     printf("%s:\n", matrixName);
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
-            printf("%d ", matrix[i][j]);
+            printf("%f ", matrix[i][j]);
         }
         printf("\n");
     }

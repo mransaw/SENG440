@@ -18,9 +18,9 @@ int main(void) {
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
     };
-    int** matrix = (int**)malloc(sizeof(int**) * M);
+    double** matrix = (double**)malloc(sizeof(double**) * M);
     for (int i = 0; i < M; ++i) {
-        matrix[i] = (int*)malloc(sizeof(int*) * M);
+        matrix[i] = (double*)malloc(sizeof(double*) * M);
     }
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < M; ++j) {
