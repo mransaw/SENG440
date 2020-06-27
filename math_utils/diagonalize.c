@@ -74,11 +74,11 @@ void applyRotations(SVD svd, int i, int j, int theta_l, int theta_r) {
     _V[j][i] = -1 * sin_r;
     _V[i][j] = cos_r;
 
-    int** _U_t = (int**)malloc(sizeof(int**));
+    int** _U_t = (int**)malloc(sizeof(int**) * M);
     transpose(_U, _U_t);
-    int** _V_t = (int**)malloc(sizeof(int**));
+    int** _V_t = (int**)malloc(sizeof(int**) * M);
     transpose(_V, _V_t);
-    int** V_t = (int**)malloc(sizeof(int**));
+    int** V_t = (int**)malloc(sizeof(int**) * M);
     transpose(svd.V, V_t);
 
 

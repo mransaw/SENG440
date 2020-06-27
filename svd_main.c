@@ -31,7 +31,7 @@ int main(void) {
     printout("input matrix", matrix);
     printf("\n");
     SVD svd = diagonalize(matrix);
-    printoutSVD(svd);
+    //printoutSVD(svd);
 
     return 0;
 }
