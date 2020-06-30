@@ -3,31 +3,80 @@
 #include <stdio.h>
 #include <diagonalize.h>
 #include <stdlib.h>
+
+#define PI 0x7FFFFFFF
+
 void arctan_test() {
     int X = 1030;
     int theta = arctan(X);
     assert(theta == (1319*X+291));
 }
 
+void sine_test() {
+    int result;
+    
+    result = lin_sin(-PI);
+    printf("sine test:\nerror (-pi in): %d / 2147500000\n", abs(result));
+    
+    result = lin_sin(-PI/2);
+    printf("error (-pi/2 in): %d / 2147500000\n", abs(result+(1<<30)));
+    
+    result = lin_sin(-PI/4);
+    printf("error (-pi/4 in): %d / 2147500000\n", abs(result+(1<<29)));
+    
+    result = lin_sin(0);
+    printf("error (0 in): %d / 2147500000\n", abs(result));
+    
+    result = lin_sin(PI/4);
+    printf("error (pi/4 in): %d / 2147500000\n", abs(result-(1<<29)));
+    
+    result = lin_sin(PI/2);
+    printf("error (pi/2 in): %d / 2147500000\n", abs(result-(1<<30)));
+    
+    result = lin_sin(PI);
+    printf("error (pi in): %d / 2147500000\n", abs(result));
+}
+
 void cosine_test() {
-    int X = 1030;
-    int theta = lin_cos(X);
-    assert(theta == (1319*X+291));
+    int result;
+    
+    result = lin_cos(-PI);
+    printf("cosine test\nerror (-pi in): %d / 2147500000\n", abs(result+(1<<30)));
+    
+    result = lin_cos(-PI/2);
+    printf("error (-pi/2 in): %d / 2147500000\n", abs(result));
+    
+    result = lin_cos(-PI/4);
+    printf("error (-pi/4 in): %d / 2147500000\n", abs(result-(1<<29)));
+    
+    result = lin_cos(0);
+    printf("error (0 in): %d / 2147500000\n", abs(result-(1<<30)));
+    
+    result = lin_cos(PI/4);
+    printf("error (pi/4 in): %d / 2147500000\n", abs(result-(1<<29)));
+    
+    result = lin_cos(PI/2);
+    printf("error (pi/2 in): %d / 2147500000\n", abs(result));
+    
+    result = lin_cos(PI);
+    printf("error (pi in): %d / 2147500000\n", abs(result+(1<<30)));
 }
 
 void dot_product_test() {
-    double* m1 = (double*)malloc(sizeof(double*) * 2);
-    double* m2 = (double*)malloc(sizeof(double*) * 2);
+    double m1[4];
+    double m2[4];
 
     m1[0] = 3.0;
     m1[1] = 5.0;
     m1[2] = 7.0;
+    m1[3] = 9.0;
 
     m2[0] = 8.0;
     m2[1] = 9.0;
     m2[2] = 14.0;
+    m2[3] = 15.0;
 
-    assert(dotProduct(m1, m2) == 167);
+    assert(dotProduct(m1, m2) == 302);
 }
 
 void matmult_test() {
@@ -76,8 +125,11 @@ void matmult_test() {
 
 int main(void) {
     printf("running diagonalize tests...\n");
+    
+    sine_test();
+    cosine_test();
     dot_product_test();
-    //matmult_test();
+
     printf("all tests passed\n");
     return 0;
 }
