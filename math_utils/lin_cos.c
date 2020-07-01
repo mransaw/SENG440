@@ -14,7 +14,6 @@ int lin_cos(int theta) {
     int y_int = (1<<30);
     
     if (theta < 0) {
-        printf("one\n");
         result = theta + y_int;
     } else {
         result = -theta + y_int;
