@@ -6,19 +6,18 @@
 int lin_cos(int theta) {
     int t_theta, result;    
     
-    // truncate theta (assumes an input scale factor of (2^31)/pi
-    t_theta = (theta>>16);
+    //assumes an input scale factor of (2^31)/pi
     
     // magnitude of slopes is 2/pi, scaled
-    int slope = (1<<16);
     
     // magnitude of y-intercepts is 1, scaled
     int y_int = (1<<30);
     
-    if (t_theta < 0) {
-        result = slope * t_theta + y_int;
+    if (theta < 0) {
+        printf("one\n");
+        result = theta + y_int;
     } else {
-        result = -slope * t_theta + y_int;
+        result = -theta + y_int;
     }
     
     // output scale factor is 2^30

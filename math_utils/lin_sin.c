@@ -6,24 +6,22 @@
 int lin_sin(int theta) {
     int t_theta, result;    
     
-    // truncate theta (assumes an input scale factor of (2^31)/pi
-    t_theta = (theta>>16);
+    // (assumes an input scale factor of (2^31)/pi
 
     // calculate bounds for theta
-    int points[2] = {-(1<<14), (1<<14)};
+    int points[2] = {-(1<<30), (1<<30)};
     
     // magnitude of slopes is 2/pi, scaled
-    int slope = (1<<16);
 
     // magnitude of y-intercepts is 2, scaled
     int y_int = 0x7FFFFFFF;
     
-    if (t_theta < points[0]) {
-        result = -slope * t_theta - y_int;
-    } else if (t_theta < points[1]) {
-        result = slope * t_theta;
+    if (theta < points[0]) {
+        result = -theta - y_int;
+    } else if (theta < points[1]) {
+        result = theta;
     } else {
-        result = -slope * t_theta + y_int;
+        result = -theta + y_int;
     }
     
     // output scale factor is 2^30
