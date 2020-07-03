@@ -114,10 +114,15 @@ void applyJacobiMethod(SVD svd, int i, int j) {
         printf("X_sum = %f\n", X_sum);
         printf("X_diff = %f\n", X_diff);
 
-        double theta_sum = atan(X_sum); //arctan(X_sum);
+        int fixed_point = pow(2, N_BITS - 1);
+        X_sum = X_sum * fixed_point;
+        double theta_sum = arctan((int)X_sum);
+        theta_sum = ((double)theta_sum) / ((double)(fixed_point * fixed_point));
+
         double theta_diff = atan(X_diff); //arctan(X_diff);
 
-        printf("theta_sum = %f\n", theta_sum);
+        printf("atan(X_sum) = %f\n", atan(X_sum));
+        printf("arctan(int_theta_sum) = theta_sum = %f\n", theta_sum);
         printf("theta_diff = %f\n", theta_diff);
 
         double theta_r = 0.5*(theta_sum + theta_diff);

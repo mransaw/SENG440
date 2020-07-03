@@ -1,5 +1,5 @@
 #ifndef M
-#define M 6
+#define M 4
 #define NUM_SWEEPS 4
 typedef struct svd_struct {
     double*** U;
