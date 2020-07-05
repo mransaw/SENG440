@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "cassert": "c",
+        "memory": "c",
+        "optional": "c",
+        "__hash_table": "c",
+        "unordered_map": "c"
+    }
+}
