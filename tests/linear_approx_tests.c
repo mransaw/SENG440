@@ -44,8 +44,8 @@ void lin_cos_tests() {
            max_error = 0,
            max_error_angle=0;    
     for (int i=0; i<NPOINTS; i++) {
-        error = ((lin_cos(test_vector_scaled[i]) + (1<<29)) >> 30) - cos(test_vector[i]);
-        total_error += fabs(error);
+        error = fabs(((lin_cos(test_vector_scaled[i]) + (1<<29)) >> 30) - cos(test_vector[i]));
+        total_error += error;
         if (error > max_error) {
             max_error = error;
             max_error_angle = test_vector[i];
@@ -61,9 +61,9 @@ void lin_sin_tests() {
            max_error = 0,
            max_error_angle=0;    
     for (int i=0; i<NPOINTS; i++) {
-        error = ((lin_sin(test_vector_scaled[i]) + (1<<29)) >> 30) - sin(test_vector[i]);
+        error = fabs(((lin_sin(test_vector_scaled[i]) + (1<<29)) >> 30) - sin(test_vector[i]));
         //printf("error: %f\n", error);
-        total_error += fabs(error);
+        total_error += error;
         if (error > max_error) {
             max_error = error;
             max_error_angle = test_vector[i];
