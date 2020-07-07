@@ -1,5 +1,5 @@
 #ifndef N_BITS
-#define N_BITS 14
+#define N_BITS 15
 double arctan_double(double x);
 int decide_method(int X);
 int arctan(int x);
