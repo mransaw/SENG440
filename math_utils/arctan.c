@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "arctan_hash_lookup_array.h"
-
+#include <stdlib.h>
 #define FLOAT_INCREMENT 0.01
 
 int lin_arctan(int x) {
@@ -27,7 +27,7 @@ int lin_arctan(int x) {
 
 int X_hash(int X) {
     //return ((X + 8192.0) / 410.0) + 0.2;
-    return (X*13 >> 10) + 104;
+    return (X >> 5) + 512;
 }
 
 void generate_arctan_table_output() {
@@ -36,12 +36,22 @@ void generate_arctan_table_output() {
     int X = 0;
     int int_output = 0;
     int i = 0;
+    int size = 1200;
+    int arr[1200];
+    for (int j = 0; j < size; ++j) {
+        arr[j] = 0;
+    }
     for (double x = MIN_ANGLE; x < MAX_ANGLE; x += FLOAT_INCREMENT) {
         X = x * (1 << (N_BITS - 1));
         int_output = atan(x) * (1 << (N_BITS - 1));
-        //printf("hash = %d, X = %d, artcan(X) = %d\n", X_hash(X), X, int_output);
-        printf("%d\n", int_output);
+        printf("hash = %d, X = %d, artcan(X) = %d\n", X_hash(X), X, int_output);
+        //printf("X_hash = i = %f, result = %d\n", X_hash(X), int_output);
+        int _i = X_hash(X);
+        arr[_i] = int_output;
         i++;
+    }
+    for (int j = 0; j < size; ++j) {
+        //printf("%d,\n", arr[j]);
     }
 }
 
@@ -113,15 +123,17 @@ int decide_method(int X) {
 }
 
 int arctan(int X) {
-    if (decide_method(X)) {
-        return table_interpolation(X);
-    } else {
-        return lin_arctan(X) >> (N_BITS - 1);
-    }
+    //if (decide_method(X)) {
+    //    return table_interpolation(X);
+    //} else {
+    //    return lin_arctan(X) >> (N_BITS - 1);
+    //}
+    return table_interpolation(X);
 }
 
 double arctan_double(double x) {
     int UPPER_BOUND = 1 << (N_BITS - 1);
+
     int X = x * UPPER_BOUND;
     double result = ((double)arctan(X) / ((double)UPPER_BOUND));
     //if (decide_method(X) == 0) {

@@ -12,12 +12,12 @@ static int test_vector_scaled[NPOINTS];
 void arctan_tests() {
     double theta = -1.0;
     double max_error = 0;
-    while (theta <= 1.0) {
+    while (theta <= 0.99) {
         theta += 0.01;
         double r1 = atan(theta);
         int X = theta * UPPER_BOUND;
         //printf("---------------\n");
-        //printf("theta: %f, X: %d\n", theta, X);
+        printf("theta: %f, X: %d\n", theta, X);
         int r2 = table_interpolation(X);
         int r3 = lin_arctan(X);
         double table_value = ((double)r2 / ((double)(UPPER_BOUND)));
@@ -76,23 +76,23 @@ void lin_sin_tests() {
 int main(void) {
     //generate_arctan_table_output();
     arctan_tests();
-    printf("---------\n");
-    
-    // generate test vectors for sin/cos
-    for (int i=0; i<NPOINTS; i++) {
-        double loopf = 2 * (double)i/(NPOINTS) - 1;
-        //printf("loopf is: %f\n", loopf);
-        // regular test vector
-        test_vector[i] = M_PI*loopf;
-        // test vector from -pi to pi, scaled
-        test_vector_scaled[i] = (unsigned int)(1<<31)*loopf;
-        //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
-    }  
-
-    // run sin/cos tests
-    lin_cos_tests();
-    printf("---------\n");
-    lin_sin_tests();
-    //printf("---------\n");
-    return 0;
+ //   printf("---------\n");
+ //   
+ //   // generate test vectors for sin/cos
+ //   for (int i=0; i<NPOINTS; i++) {
+ //       double loopf = 2 * (double)i/(NPOINTS) - 1;
+ //       //printf("loopf is: %f\n", loopf);
+ //       // regular test vector
+ //       test_vector[i] = M_PI*loopf;
+ //       // test vector from -pi to pi, scaled
+ //       test_vector_scaled[i] = (unsigned int)(1<<31)*loopf;
+ //       //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
+ //   }  
+//
+ //   // run sin/cos tests
+ //   lin_cos_tests();
+ //   printf("---------\n");
+ //   lin_sin_tests();
+ //   //printf("---------\n");
+ //   return 0;
 }
