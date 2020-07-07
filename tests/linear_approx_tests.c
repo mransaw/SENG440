@@ -30,7 +30,7 @@ void arctan_tests() {
         printf("linear approx arctan = %f\n", linear_approx_value);
         printf("atan() = %f\n", r1);
         printf("decided value: %f\n", result);
-        printf("----------------\n");*/
+        printf("----------------\n");
         if (fabs(result - r1) > max_error) {
             max_error = fabs(result - r1);
         }

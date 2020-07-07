@@ -114,12 +114,15 @@ void applyJacobiMethod(SVD svd, int i, int j) {
         printf("X_sum = %f\n", X_sum);
         printf("X_diff = %f\n", X_diff);
 
-        int fixed_point = pow(2, N_BITS - 1);
+        int fixed_point = 1 << (N_BITS - 1);
         X_sum = X_sum * fixed_point;
-        double theta_sum = arctan((int)X_sum);
-        theta_sum = ((double)theta_sum) / ((double)(fixed_point * fixed_point));
 
-        double theta_diff = arctan_double(X_diff);
+        double theta_sum = arctan(X_sum);
+        theta_sum = ((double)theta_sum) / ((double)(fixed_point));
+
+        X_diff = X_diff * fixed_point;
+        double theta_diff = arctan(X_diff);
+        theta_diff = ((double)theta_diff) / ((double)(fixed_point));
 
         printf("atan(X_sum) = %f\n", atan(X_sum));
         printf("arctan(int_theta_sum) = theta_sum = %f\n", theta_sum);
@@ -137,7 +140,9 @@ void sweep(SVD svd) {
     int row = 0;
     int col = row + 1;
     for (row = 0; row < M; ++row) {
+        printf("SWEEP %d", row + 1);
         for (col = row + 1; col < M; ++col) {
+            printf(", ITERATION %d\n", col);
             applyJacobiMethod(svd, row, col);
         }
     }
