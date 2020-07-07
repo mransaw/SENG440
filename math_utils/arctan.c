@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "arctan_hash_lookup_array.h"
-#include <stdlib.h>
+
 #define FLOAT_INCREMENT 0.01
 
 int lin_arctan(int x) {
