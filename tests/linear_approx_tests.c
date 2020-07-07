@@ -19,9 +19,9 @@ void arctan_tests() {
         double table_value = ((double)r2 / ((double)(UPPER_BOUND)));
         double linear_approx_value = ((double)r3 / ((double)(UPPER_BOUND * UPPER_BOUND)));
         double result = ((double)arctan(X) / ((double)UPPER_BOUND));
-        if (decide_method(X) == 0) {
-            result /= UPPER_BOUND;
-        }
+        //if (decide_method(X) == 0) {
+        //    result /= UPPER_BOUND;
+        //}
         printf("table value = %f\n", table_value);
         printf("linear approx arctan = %f\n", linear_approx_value);
         printf("atan() = %f\n", r1);
