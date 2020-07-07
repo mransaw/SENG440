@@ -116,7 +116,7 @@ int arctan(int X) {
     if (decide_method(X)) {
         return table_interpolation(X);
     } else {
-        return lin_arctan(X);
+        return lin_arctan(X) >> (N_BITS - 1);
     }
 }
 
@@ -124,8 +124,8 @@ double arctan_double(double x) {
     int UPPER_BOUND = 1 << (N_BITS - 1);
     int X = x * UPPER_BOUND;
     double result = ((double)arctan(X) / ((double)UPPER_BOUND));
-    if (decide_method(X) == 0) {
-        result /= UPPER_BOUND;
-    }
+    //if (decide_method(X) == 0) {
+    //    result /= UPPER_BOUND;
+    //}
     return result;
 }
