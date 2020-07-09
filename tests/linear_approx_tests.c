@@ -14,11 +14,17 @@ static double test_vector[NPOINTS];
 static int test_vector_scaled[NPOINTS];
 
 void arctan_tests_int(void) {
-    int min_element = -8192,
+    /*int min_element = -8192,
         max_element = 8192;
+    // ^^^ above is only true for the first iteration of sweep 1 ^^^ */
     
-    int min_input = (min_element/1) << SF_IN,
-        max_input = (max_element/1) << SF_IN;
+    // max unscaled value of matrix elements is (2^31)/(2^SF_IN)
+    int min_element = -(1 << (32-SF_IN)),
+        max_element = 1 << (32-SF_IN);   
+       
+    // max input magnitude is 2^31
+    int min_input = 0x80000000,
+        max_input = 0x7FFFFFFF;
         
     printf("input to arctan(): min is %d, max is %d\n", min_input, max_input);
     
