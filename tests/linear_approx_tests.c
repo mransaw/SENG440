@@ -22,7 +22,7 @@ void arctan_tests_int(void) {
     int min_element = -(1 << (32-SF_IN)),
         max_element = 1 << (32-SF_IN);   
        
-    // max input magnitude is 2^31/(2^SF_IN)
+    // max input magnitude is 2^31
     int min_input = 0x80000000,
         max_input = 0x7FFFFFFF;
         
