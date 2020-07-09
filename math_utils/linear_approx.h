@@ -1,5 +1,6 @@
 #ifndef N_BITS
 #define N_BITS 15
+int int_arctan(int X);
 double d_arctan(double x);
 void generate_linear_approximation();
 int arctan(int x);
