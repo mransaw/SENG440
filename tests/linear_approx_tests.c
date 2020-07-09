@@ -3,12 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define NPOINTS 300
-
-#define SF_IN 14   // input scale factor for arctan() is 2^SF_IN
-#define SF_OUT 14  // output scale factor for arctan() is (2^SF_OUT)/pi 
-#define MAX_ERROR_ATAN 10   // arctan maximum error in %
-
 int UPPER_BOUND = 1 << SF_IN;
 static double test_vector[NPOINTS];
 static int test_vector_scaled[NPOINTS];
