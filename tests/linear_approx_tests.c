@@ -97,7 +97,7 @@ void lin_cos_tests() {
            max_error = 0,
            max_error_angle=0;    
     for (int i=0; i<NPOINTS; i++) {
-        error = fabs(((lin_cos(test_vector_scaled[i]) + (1<<29)) >> 30) - cos(test_vector[i]));
+        error = fabs(((lin_cos(test_vector_scaled[i]) + (1<<(SF_ATAN_IN-1))) >> SF_ATAN_IN) - cos(test_vector[i]));
         total_error += error;
         if (error > max_error) {
             max_error = error;
@@ -114,7 +114,7 @@ void lin_sin_tests() {
            max_error = 0,
            max_error_angle=0;    
     for (int i=0; i<NPOINTS; i++) {
-        error = fabs(((lin_sin(test_vector_scaled[i]) + (1<<29)) >> 30) - sin(test_vector[i]));
+        error = fabs(((lin_sin(test_vector_scaled[i]) + (1<<(SF_ATAN_IN-1))) >> SF_ATAN_IN) - sin(test_vector[i]));
         //printf("error: %f\n", error);
         total_error += error;
         if (error > max_error) {
@@ -133,21 +133,21 @@ int main(void) {
     arctan_tests_int();
  //   printf("---------\n");
  //   
- //   // generate test vectors for sin/cos
- //   for (int i=0; i<NPOINTS; i++) {
- //       double loopf = 2 * (double)i/(NPOINTS) - 1;
- //       //printf("loopf is: %f\n", loopf);
- //       // regular test vector
- //       test_vector[i] = M_PI*loopf;
- //       // test vector from -pi to pi, scaled
- //       test_vector_scaled[i] = (unsigned int)(1<<31)*loopf;
- //       //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
- //   }  
+    // generate test vectors for sin/cos
+    /*for (int i=0; i<NPOINTS; i++) {
+        double loopf = 2 * (double)i/(NPOINTS) - 1;
+        //printf("loopf is: %f\n", loopf);
+        // regular test vector
+        test_vector[i] = M_PI*loopf;
+        // test vector from -pi to pi, scaled
+        test_vector_scaled[i] = loopf*pow(2,SF_ATAN_OUT);
+        //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
+    } */ 
 //
  //   // run sin/cos tests
- //   lin_cos_tests();
- //   printf("---------\n");
- //   lin_sin_tests();
+    //lin_cos_tests();
+    //printf("---------\n");
+    //lin_sin_tests();
  //   //printf("---------\n");
- //   return 0;
+    //return 0;
 }
