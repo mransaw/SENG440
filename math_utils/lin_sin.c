@@ -3,27 +3,20 @@
 #include <assert.h>
 #include "linear_approx.h"
 
+#define Y_INT (1<<(1+SF_ATAN_IN))    // magnitude of y-intercepts is 2, scaled
+#define LOW_POINT -(1<<(SF_ATAN_OUT-1))  // common points of approximation are pi/2 and -pi/2, scaled
+#define HIGH_POINT (1<<(SF_ATAN_OUT-1))
+
 int lin_sin(int theta) {
-    int t_theta, result;    
+    int result;    
     
-    // (assumes an input scale factor of (2^31)/pi
-
-    // calculate bounds for theta
-    int points[2] = {-(1<<30), (1<<30)};
-    
-    // magnitude of slopes is 2/pi, scaled
-
-    // magnitude of y-intercepts is 2, scaled
-    int y_int = 0x7FFFFFFF;
-    
-    if (theta < points[0]) {
-        result = -theta - y_int;
-    } else if (theta < points[1]) {
-        result = theta;
+    if (theta < LOW_POINT) {
+        result = -SLOPE_SINCOS * theta - Y_INT;
+    } else if (theta < HIGH_POINT) {
+        result = SLOPE_SINCOS * theta;
     } else {
-        result = -theta + y_int;
+        result = -SLOPE_SINCOS * theta + Y_INT;
     }
     
-    // output scale factor is 2^30
     return result;
 }
