@@ -6,15 +6,13 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define SF_ATAN_IN 14       // scale factor is 2^SF_ATAN_IN
-#define SF_ATAN_OUT 14      // scale factor is (2^SF_ATAN_OUT)/pi
-
 // TODO: #define IDENTITY_MATRIX_M
 
 void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M]);
 void transposeM(int source[M][M], int dest[M][M]);
 void print_matrix2(int matrix[2][2]);
 void print_matrixM(int matrix[M][M]);
+void print_descaled(int matrix[M][M]);
 
 int main(void) {
     // initialize done flag
@@ -33,6 +31,7 @@ int main(void) {
             mat_M[i][j] = (input[i][j] << SF_ATAN_IN);
         }
     }
+    //print_descaled(mat_M);
     
     // scaled identity matrices
     int U[M][M], Vt[M][M], I[M][M];
@@ -179,7 +178,7 @@ int main(void) {
                 ltheta = (sum - diff + 1) >> 1;   // TODO: saturating addition?
                 rtheta = (sum + diff + 1) >> 1;
                 
-                //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
+                printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n\n", sum, diff, ltheta, rtheta);
                 
                 // calculate rotation matrix elements
                 lcos = lin_cos(ltheta);
@@ -189,7 +188,7 @@ int main(void) {
                 
                 // build rotation matrices
                 memcpy(r_U, I, M*M*sizeof(int));
-                memcpy(r_V, I, M*M*sizeof(int));
+                memcpy(r_Vt, I, M*M*sizeof(int));
                 
                 r_U[i][i] = lcos;
                 r_U[i][j] = -lsin;
@@ -204,7 +203,7 @@ int main(void) {
                 // apply rotations to M
                 dot_productM(r_U, mat_M, mat_M);
                 dot_productM(mat_M, r_Vt, mat_M);
-                //print_matrixM(mat_M);
+                print_descaled(mat_M);
                 
                 // update U and V
                 transposeM(r_U, r_Ut);
@@ -214,7 +213,7 @@ int main(void) {
                 dot_productM(r_V, Vt, Vt);
             }
         }
-        print_matrixM(mat_M);
+        //print_matrixM(mat_M);
         // check if M is close enough
         done = true;
         for (int i=0; i<M; i++) {
@@ -226,7 +225,7 @@ int main(void) {
                 }
             }
         }
-        //return EXIT_SUCCESS; //TODO: remove after testing
+        return EXIT_SUCCESS; //TODO: remove after testing
     }    
     return EXIT_SUCCESS;
 }
@@ -280,6 +279,17 @@ void print_matrixM(int matrix[M][M]) {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             printf("%d ", matrix[k][l]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    return;
+}
+
+void print_descaled(int matrix[M][M]) {
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            printf("%d ", (matrix[k][l] + SF_ATAN_IN-1) >> SF_ATAN_IN);
         }
         printf("\n");
     }
