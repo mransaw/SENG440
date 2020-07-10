@@ -27,9 +27,9 @@ void arctan_tests_int(void) {
         max_element = 8192;
     // ^^^ above is only true for the first iteration of sweep 1 ^^^ */
     
-    // max unscaled value of matrix elements is (2^31)/(2^SF_IN)
-    int min_element = -(1 << (32-SF_IN)),
-        max_element = 1 << (32-SF_IN);   
+    // max unscaled value of matrix elements is (2^31)/(2^SF_ATAN_IN)
+    int min_element = -(1 << (32-SF_ATAN_IN)),
+        max_element = 1 << (32-SF_ATAN_IN);   
        
     // max input magnitude is 2^31
     int min_input = 0x80000000,
@@ -40,9 +40,9 @@ void arctan_tests_int(void) {
     // test minimum input
     int output = arctan(min_input); // function being tested
     double actual = atan2(min_element,1);
-    int want = actual / M_PI * pow(2,SF_OUT);    //-pi/2, scaled
+    int want = actual / M_PI * pow(2,SF_ATAN_OUT);    //-pi/2, scaled
     
-    printf("output = %d, wanted: %d\n", output, want);
+    printf("input: %d, output = %d, wanted: %d\n", min_input, output, want);
     
     double error = fabs((double)(output - want)/want) * 100;
     printf("percent error is %f\n", error);
@@ -55,9 +55,9 @@ void arctan_tests_int(void) {
     // test maximum input
     output = arctan(max_input); // function being tested
     actual = atan2(max_element,1);
-    want = actual / M_PI * pow(2,SF_OUT);    //pi/2, scaled
+    want = actual / M_PI * pow(2,SF_ATAN_OUT);    //pi/2, scaled
     
-    printf("output = %d, wanted: %d\n", output, want);
+    printf("input: %d, output = %d, wanted: %d\n", max_input, output, want);
         
     error = fabs((double)(output - want)/want) * 100;
     printf("percent error is %f\n", error);
@@ -65,6 +65,33 @@ void arctan_tests_int(void) {
     if (error > MAX_ERROR_ATAN) {
         printf("integer arctan test failed for maximum input\n");         
         return;
+    }
+    
+    int nloops = 500,
+        range = 5;
+    for (int i=0; i<nloops; i++) {
+        double loopf = 2 * (double)i/(nloops) - 1;
+        //printf("loopf is: %f\n", loopf);
+        // regular test vector
+        //test_vector[i] = M_PI*loopf;
+        int scaled_input = loopf * range * (1<<SF_ATAN_IN);
+        output = arctan(scaled_input);    // function being tested
+        // test vector from -pi to pi, scaled
+        //test_vector_scaled[i] = loopf*pow(2,SF_ATAN_IN);
+        double input = loopf * range;
+        actual = atan(input);
+        want = actual / M_PI * pow(2,SF_ATAN_OUT);
+        
+        printf("\ninput: %d(%f), output = %d, wanted: %d(%f)\n", scaled_input, input, output, want, actual);
+        
+        error = fabs((double)(output - want)/want) * 100;
+        printf("percent error is %f\n", error);
+            
+        if (error > MAX_ERROR_ATAN) {
+            printf("integer arctan test failed for input: %d(%f rads)\n\n", scaled_input, input);         
+            return;
+        }
+        
     }
     
     printf("integer arctan test passed\n");
@@ -111,10 +138,10 @@ int main(void) {
     arctan_tests();
    //printf("---------\n");
    arctan_tests_int();
- //   printf("---------\n");
+    //printf("---------\n");
  //   
     // generate test vectors for sin/cos
-    /*for (int i=0; i<NPOINTS; i++) {
+   /* for (int i=0; i<NPOINTS; i++) {
         double loopf = 2 * (double)i/(NPOINTS) - 1;
         //printf("loopf is: %f\n", loopf);
         // regular test vector
@@ -122,12 +149,12 @@ int main(void) {
         // test vector from -pi to pi, scaled
         test_vector_scaled[i] = loopf*pow(2,SF_ATAN_OUT);
         //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
-    } */ 
+    }  */
 //
  //   // run sin/cos tests
-    //lin_cos_tests();
-    //printf("---------\n");
-    //lin_sin_tests();
+ //   lin_cos_tests();
+   // printf("---------\n");
+   // lin_sin_tests();
  //   //printf("---------\n");
     //return 0;
 }
