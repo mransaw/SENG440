@@ -3,22 +3,16 @@
 #include <assert.h>
 #include "linear_approx.h"
 
+#define Y_INT (1<<SF_ATAN_IN)    // magnitude of y-intercepts is 1, scaled
+
 int lin_cos(int theta) {
-    int t_theta, result;    
-    
-    //assumes an input scale factor of (2^31)/pi
-    
-    // magnitude of slopes is 2/pi, scaled
-    
-    // magnitude of y-intercepts is 1, scaled
-    int y_int = (1<<30);
+    int result;    
     
     if (theta < 0) {
-        result = theta + y_int;
+        result = SLOPE_SINCOS * theta + Y_INT;
     } else {
-        result = -theta + y_int;
+        result = -SLOPE_SINCOS * theta + Y_INT;
     }
     
-    // output scale factor is 2^30
     return result;
 }
