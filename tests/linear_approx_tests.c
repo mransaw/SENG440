@@ -3,9 +3,24 @@
 #include <math.h>
 #include <stdlib.h>
 
-int UPPER_BOUND = 1 << SF_IN;
+int UPPER_BOUND = 1 << SF_ATAN_IN;
 static double test_vector[NPOINTS];
 static int test_vector_scaled[NPOINTS];
+
+void arctan_tests() {
+    // max input magnitude is 2^31
+    int min_input = -8192,
+        max_input = 8192;
+    double x;
+    double r1;
+    double r2;
+    for (int X = min_input; X <= max_input; ++X) {
+        x = ((double)X) / ((double)(1 << SF_ATAN_IN));
+        r1 = atan(x);
+        r2 = ((double)(arctan(X) * ((double)M_PI))) / ((double)(1 << SF_ATAN_OUT)) / ((double)(1 << SF_ATAN_OUT));
+        printf("atan(x = %f) = %f, arctan(X = %d) * M_PI/ (2^14) = %f, error = %f\n", x, r1, X, r2, fabs(r1 - r2));
+    }
+}
 
 void arctan_tests_int(void) {
     /*int min_element = -8192,
@@ -56,26 +71,6 @@ void arctan_tests_int(void) {
     return;
 }
 
-void arctan_tests() {
-    double theta = -1.0;
-    double max_error = 0;
-    while (theta <= 0.99) {
-        theta += 0.01;
-        double r1 = atan(theta);
-        int X = theta * UPPER_BOUND;
-        double linear_approx_value = (arctan(X) * M_PI) / pow(2, 14);
-        printf("x = %f\n", theta);
-        printf("linear approx arctan = %f\n", linear_approx_value);
-        printf("atan() = %f\n", r1);
-        int result = linear_approx_value;
-        printf("----------------\n");
-        if (fabs(result - r1) > max_error) {
-            max_error = fabs(result - r1);
-        }
-    }
-    printf("\n\nARCTAN MAX ERROR: %f\n\n\n", max_error);
-}
-
 void lin_cos_tests() {
     double error,
            total_error = 0,
@@ -113,7 +108,7 @@ void lin_sin_tests() {
 
 int main(void) {
     //generate_arctan_table_output();
-    //arctan_tests();
+    arctan_tests();
    //printf("---------\n");
    arctan_tests_int();
  //   printf("---------\n");
