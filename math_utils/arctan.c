@@ -13,9 +13,9 @@ void generate_linear_approximation(double MIN, double MAX, double INC) {
         slopes[i] = (atan(upper_X) - atan(lower_X)) / (upper_X - lower_X);
         intercepts[i] = 0.5 * (atan(upper_X) + atan(lower_X)) - (slopes[i] * (upper_X + lower_X) * 0.5);
         if (lower_X == MIN) {
-            printf("if (%d <= x && x< %d) { return (%d * x) + %d; }\n", (int)(lower_X * (1 << SF_ATAN_IN)), (int)(upper_X * (1 << SF_ATAN_IN)), (int)(slopes[i] * (1 << SF_ATAN_IN)), (int)(intercepts[i] * (1 << SF_ATAN_IN)));
+            printf("if (%d <= x && x< %d) { return (%d * x) + %d; }\n", (int)(lower_X * (1 << SF_ATAN_IN)), (int)(upper_X * (1 << SF_ATAN_IN)), (int)(slopes[i] * (1 << SF_ATAN_IN)/ M_PI), (int)(intercepts[i] * (1 << SF_ATAN_IN)/ M_PI));
         } else {
-            printf("else if (%d <= x && x< %d) { return (%d * x) + %d; }\n", (int)(lower_X * (1 << SF_ATAN_IN)), (int)(upper_X * (1 << SF_ATAN_IN)), (int)(slopes[i] * (1 << SF_ATAN_IN)), (int)(intercepts[i] * (1 << SF_ATAN_IN)));
+            printf("else if (%d <= x && x< %d) { return (%d * x) + %d; }\n", (int)(lower_X * (1 << SF_ATAN_IN)), (int)(upper_X * (1 << SF_ATAN_IN)), (int)(slopes[i] * (1 << SF_ATAN_IN)/ M_PI), (int)(intercepts[i] * (1 << SF_ATAN_IN)/ M_PI));
         }
         upper_X += INC;
         ++i;
@@ -53,111 +53,86 @@ int arctan(int X) {
     //double x = ((double)X) / ((double)(1 << SF_ATAN_IN));
     //double result = (d_arctan(x) * (1 << SF_ATAN_OUT) / M_PI) - 1;
     //return result;
-    return int_arctan(X) / M_PI;
+    return int_arctan(X);
 }
 
 int int_arctan(int X) {
     int x = X;
     if ((-1 * (1 << SF_ATAN_IN)) <= x && x <= (1 * (1 << SF_ATAN_IN))) {
-        if (-16384 <= x && x< -14745) { return (8615 * x) + -4252; }
-        else if (-14745 <= x && x< -13107) { return (9514 * x) + -3443; }
-        else if (-13107 <= x && x< -11468) { return (10488 * x) + -2664; }
-        else if (-11468 <= x && x< -9830) { return (11519 * x) + -1942; }
-        else if (-9830 <= x && x< -8192) { return (12578 * x) + -1307; }
-        else if (-8192 <= x && x< -6553) { return (13621 * x) + -785; }
-        else if (-6553 <= x && x< -4915) { return (14589 * x) + -398; }
-        else if (-4915 <= x && x< -3276) { return (15410 * x) + -151; }
-        else if (-3276 <= x && x< -1638) { return (16011 * x) + -31; }
-        else if (-1638 <= x && x< 0) { return (16329 * x) + 0; }
-        else if (0 <= x && x< 1638) { return (16329 * x) + 0; }
-        else if (1638 <= x && x< 3276) { return (16011 * x) + 31; }
-        else if (3276 <= x && x< 4915) { return (15410 * x) + 151; }
-        else if (4915 <= x && x< 6553) { return (14589 * x) + 398; }
-        else if (6553 <= x && x< 8191) { return (13621 * x) + 785; }
-        else if (8191 <= x && x< 9830) { return (12578 * x) + 1307; }
-        else if (9830 <= x && x< 11468) { return (11519 * x) + 1942; }
-        else if (11468 <= x && x< 13107) { return (10488 * x) + 2664; }
-        else if (13107 <= x && x< 14745) { return (9514 * x) + 3443; }
-        else if (14745 <= x && x< 16383) { return (8615 * x) + 4252; }
+        if (-16384 <= x && x< -14745) { return (2742 * x) + -1353; }
+        else if (-14745 <= x && x< -13107) { return (3028 * x) + -1095; }
+        else if (-13107 <= x && x< -11468) { return (3338 * x) + -848; }
+        else if (-11468 <= x && x< -9830) { return (3666 * x) + -618; }
+        else if (-9830 <= x && x< -8192) { return (4003 * x) + -416; }
+        else if (-8192 <= x && x< -6553) { return (4335 * x) + -250; }
+        else if (-6553 <= x && x< -4915) { return (4644 * x) + -126; }
+        else if (-4915 <= x && x< -3276) { return (4905 * x) + -48; }
+        else if (-3276 <= x && x< -1638) { return (5096 * x) + -10; }
+        else if (-1638 <= x && x< 0) { return (5197 * x) + 0; }
+        else if (0 <= x && x< 1638) { return (5197 * x) + 0; }
+        else if (1638 <= x && x< 3276) { return (5096 * x) + 10; }
+        else if (3276 <= x && x< 4915) { return (4905 * x) + 48; }
+        else if (4915 <= x && x< 6553) { return (4644 * x) + 126; }
+        else if (6553 <= x && x< 8191) { return (4335 * x) + 250; }
+        else if (8191 <= x && x< 9830) { return (4003 * x) + 416; }
+        else if (9830 <= x && x< 11468) { return (3666 * x) + 618; }
+        else if (11468 <= x && x< 13107) { return (3338 * x) + 848; }
+        else if (13107 <= x && x< 14745) { return (3028 * x) + 1095; }
+        else if (14745 <= x && x< 16383) { return (2742 * x) + 1353; }
         else { return 0;}
     }
     else if ((-10 * (1 << SF_ATAN_IN)) <= x && x <= (10 * (1 << SF_ATAN_IN))) {
-        if (-163840 <= x && x< -147456) { return (180 * x) + -22302; }
-        else if (-147456 <= x && x< -131072) { return (224 * x) + -21903; }
-        else if (-131072 <= x && x< -114688) { return (287 * x) + -21399; }
-        else if (-114688 <= x && x< -98304) { return (380 * x) + -20744; }
-        else if (-98304 <= x && x< -81920) { return (528 * x) + -19860; }
-        else if (-81920 <= x && x< -65536) { return (779 * x) + -18603; }
-        else if (-65536 <= x && x< -49152) { return (1257 * x) + -16690; }
-        else if (-49152 <= x && x< -32768) { return (2324 * x) + -13489; }
-        else if (-32768 <= x && x< -16384) { return (5271 * x) + -7596; }
-        else if (-16384 <= x && x< 0) { return (12867 * x) + 0; }
-        else if (0 <= x && x< 16384) { return (12867 * x) + 0; }
-        else if (16384 <= x && x< 32768) { return (5271 * x) + 7596; }
-        else if (32768 <= x && x< 49152) { return (2324 * x) + 13489; }
-        else if (49152 <= x && x< 65536) { return (1257 * x) + 16690; }
-        else if (65536 <= x && x< 81920) { return (779 * x) + 18603; }
-        else if (81920 <= x && x< 98304) { return (528 * x) + 19860; }
-        else if (98304 <= x && x< 114688) { return (380 * x) + 20744; }
-        else if (114688 <= x && x< 131072) { return (287 * x) + 21399; }
-        else if (131072 <= x && x< 147456) { return (224 * x) + 21903; }
-        else if (147456 <= x && x< 163840) { return (180 * x) + 22302; }
+        if (-163840 <= x && x< -147456) { return (57 * x) + -7099; }
+        else if (-147456 <= x && x< -131072) { return (71 * x) + -6971; }
+        else if (-131072 <= x && x< -114688) { return (91 * x) + -6811; }
+        else if (-114688 <= x && x< -98304) { return (121 * x) + -6603; }
+        else if (-98304 <= x && x< -81920) { return (168 * x) + -6321; }
+        else if (-81920 <= x && x< -65536) { return (248 * x) + -5921; }
+        else if (-65536 <= x && x< -49152) { return (400 * x) + -5312; }
+        else if (-49152 <= x && x< -32768) { return (740 * x) + -4293; }
+        else if (-32768 <= x && x< -16384) { return (1677 * x) + -2418; }
+        else if (-16384 <= x && x< 0) { return (4096 * x) + 0; }
+        else if (0 <= x && x< 16384) { return (4096 * x) + 0; }
+        else if (16384 <= x && x< 32768) { return (1677 * x) + 2418; }
+        else if (32768 <= x && x< 49152) { return (740 * x) + 4293; }
+        else if (49152 <= x && x< 65536) { return (400 * x) + 5312; }
+        else if (65536 <= x && x< 81920) { return (248 * x) + 5921; }
+        else if (81920 <= x && x< 98304) { return (168 * x) + 6321; }
+        else if (98304 <= x && x< 114688) { return (121 * x) + 6603; }
+        else if (114688 <= x && x< 131072) { return (91 * x) + 6811; }
+        else if (131072 <= x && x< 147456) { return (71 * x) + 6971; }
+        else if (147456 <= x && x< 163840) { return (57 * x) + 7099; }
         else { return 0;}
     }
     else { 
-        if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -25735; }
-        else if (-2147483648 <= x && x< -2001207296) { return (0 * x) + -25735; }
-        else if (-2001207296 <= x && x< -1837367296) { return (0 * x) + -25735; }
-        else if (-1837367296 <= x && x< -1673527296) { return (0 * x) + -25735; }
-        else if (-1673527296 <= x && x< -1509687296) { return (0 * x) + -25735; }
-        else if (-1509687296 <= x && x< -1345847296) { return (0 * x) + -25735; }
-        else if (-1345847296 <= x && x< -1182007296) { return (0 * x) + -25735; }
-        else if (-1182007296 <= x && x< -1018167296) { return (0 * x) + -25735; }
-        else if (-1018167296 <= x && x< -854327296) { return (0 * x) + -25735; }
-        else if (-854327296 <= x && x< -690487296) { return (0 * x) + -25735; }
-        else if (-690487296 <= x && x< -526647296) { return (0 * x) + -25735; }
-        else if (-526647296 <= x && x< -362807296) { return (0 * x) + -25734; }
-        else if (-362807296 <= x && x< -198967296) { return (0 * x) + -25733; }
-        else if (-198967296 <= x && x< -35127296) { return (0 * x) + -25726; }
-        else if (-35127296 <= x && x< 128712704) { return (5 * x) + -14694; }
-        else if (128712704 <= x && x< 292552704) { return (0 * x) + 25732; }
-        else if (292552704 <= x && x< 456392704) { return (0 * x) + 25734; }
-        else if (456392704 <= x && x< 620232704) { return (0 * x) + 25734; }
-        else if (620232704 <= x && x< 784072704) { return (0 * x) + 25735; }
-        else if (784072704 <= x && x< 947912704) { return (0 * x) + 25735; }
-        else if (947912704 <= x && x< 1111752704) { return (0 * x) + 25735; }
-        else if (1111752704 <= x && x< 1275592704) { return (0 * x) + 25735; }
-        else if (1275592704 <= x && x< 1439432704) { return (0 * x) + 25735; }
-        else if (1439432704 <= x && x< 1603272704) { return (0 * x) + 25735; }
-        else if (1603272704 <= x && x< 1767112704) { return (0 * x) + 25735; }
-        else if (1767112704 <= x && x< 1930952704) { return (0 * x) + 25735; }
-        else if (1930952704 <= x && x< 2094792704) { return (0 * x) + 25735; }
-        else if (2094792704 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + 25735; }
-        else if (-2147483648 <= x && x<= -2147483648) { return (0 * x) + 25735; }
-        else { return 25735;}
+        if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2147483648) { return (0 * x) + -8191; }
+        else if (-2147483648 <= x && x< -2001207296) { return (0 * x) + -8191; }
+        else if (-2001207296 <= x && x< -1837367296) { return (0 * x) + -8191; }
+        else if (-1837367296 <= x && x< -1673527296) { return (0 * x) + -8191; }
+        else if (-1673527296 <= x && x< -1509687296) { return (0 * x) + -8191; }
+        else if (-1509687296 <= x && x< -1345847296) { return (0 * x) + -8191; }
+        else if (-1345847296 <= x && x< -1182007296) { return (0 * x) + -8191; }
+        else if (-1182007296 <= x && x< -1018167296) { return (0 * x) + -8191; }
+        else if (-1018167296 <= x && x< -854327296) { return (0 * x) + -8191; }
+        else if (-854327296 <= x && x< -690487296) { return (0 * x) + -8191; }
+        else if (-690487296 <= x && x< -526647296) { return (0 * x) + -8191; }
+        else if (-526647296 <= x && x< -362807296) { return (0 * x) + -8191; }
+        else if (-362807296 <= x && x< -198967296) { return (0 * x) + -8191; }
+        else if (-198967296 <= x && x< -35127296) { return (0 * x) + -8189; }
+        else if (-35127296 <= x && x< 128712704) { return (1 * x) + -4677; }
+        else { return 8191;}
     }
 }
 
