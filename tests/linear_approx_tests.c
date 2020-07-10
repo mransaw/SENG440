@@ -74,7 +74,7 @@ void arctan_tests_int(void) {
         //printf("loopf is: %f\n", loopf);
         // regular test vector
         //test_vector[i] = M_PI*loopf;
-        int scaled_input = loopf * range * (1<<SF_ATAN_IN);
+        int scaled_input = loopf * (range << SF_ATAN_IN);
         output = arctan(scaled_input);    // function being tested
         // test vector from -pi to pi, scaled
         //test_vector_scaled[i] = loopf*pow(2,SF_ATAN_IN);
