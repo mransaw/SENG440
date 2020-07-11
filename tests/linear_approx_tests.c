@@ -9,16 +9,20 @@ static int test_vector_scaled[NPOINTS];
 
 void arctan_tests() {
     // max input magnitude is 2^31
-    int min_input = -8192,
-        max_input = 8192;
+   // int min_input = 0x80000000,
+   //     max_input = 0x7FFFFFFF;
+   int min_input = -1 * pow(2, SF_ATAN_IN);
+   int max_input = 1 * pow(2, SF_ATAN_IN);
+   int inc = 0.01 * pow(2, SF_ATAN_IN);
     double x;
     double r1;
     double r2;
-    for (int X = min_input; X <= max_input; ++X) {
-        x = ((double)X) / ((double)(1 << SF_ATAN_IN));
+    printf("%d, %d\n", min_input, max_input);
+    for (int X = min_input; X <= max_input; X += inc) {
+        x = X / pow(2, SF_ATAN_IN);
         r1 = atan(x);
-        r2 = ((double)(arctan(X) * ((double)M_PI))) / ((double)(1 << SF_ATAN_OUT)) / ((double)(1 << SF_ATAN_OUT));
-        printf("atan(x = %f) = %f, arctan(X = %d) * M_PI/ (2^14) = %f, error = %f\n", x, r1, X, r2, fabs(r1 - r2));
+        r2 = arctan(X) * M_PI / pow(2, SF_ATAN_OUT);
+        printf("atan(x = %f) = %f, arctan(X = %d) / (2^17) = %f, error = %f, percent error %f\n", x, r1, X, r2, fabs(r1 - r2), fabs(100 * fabs(r1 - r2) / (r1)));
     }
 }
 
@@ -80,7 +84,7 @@ void arctan_tests_int(void) {
         //test_vector_scaled[i] = loopf*pow(2,SF_ATAN_IN);
         double input = loopf * range;
         actual = atan(input);
-        want = actual / M_PI * pow(2,SF_ATAN_OUT);
+        want = (actual / M_PI) * pow(2,SF_ATAN_OUT);
         
         printf("\ninput: %d(%f), output = %d, wanted: %d(%f)\n", scaled_input, input, output, want, actual);
         
@@ -137,7 +141,7 @@ int main(void) {
     //generate_arctan_table_output();
     arctan_tests();
    //printf("---------\n");
-   arctan_tests_int();
+   //arctan_tests_int();
     //printf("---------\n");
  //   
     // generate test vectors for sin/cos
