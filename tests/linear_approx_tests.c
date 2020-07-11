@@ -21,8 +21,8 @@ void arctan_tests() {
     for (int X = min_input; X <= max_input; X += inc) {
         x = X / pow(2, SF_ATAN_IN);
         r1 = atan(x);
-        r2 = arctan(X) * M_PI / pow(2, SF_ATAN_OUT);
-        printf("atan(x = %f) = %f, arctan(X = %d) / (2^17) = %f, error = %f, percent error %f\n", x, r1, X, r2, fabs(r1 - r2), fabs(100 * fabs(r1 - r2) / (r1)));
+        r2 = arctan(X) / (pow(2, SF_ATAN_OUT) / M_PI);
+        printf("atan(x = %f) = %f, arctan(X = %d) * pi / scale_out = %f, diff = %f, percent error %f\n", x, r1, X, r2, r1 - r2, 100 * fabs(r2 - r1)/ r1);
     }
 }
 
@@ -44,7 +44,7 @@ void arctan_tests_int(void) {
     // test minimum input
     int output = arctan(min_input); // function being tested
     double actual = atan2(min_element,1);
-    int want = actual / M_PI * pow(2,SF_ATAN_OUT);    //-pi/2, scaled
+    int want = actual * (pow(2,SF_ATAN_OUT) / M_PI);    //-pi/2, scaled
     
     printf("input: %d, output = %d, wanted: %d\n", min_input, output, want);
     
@@ -138,8 +138,8 @@ void lin_sin_tests() {
 }
 
 int main(void) {
-    //generate_arctan_table_output();
-    arctan_tests();
+generate_linear_approximation(-1.0, 1.0, 0.01);
+//arctan_tests();
    //printf("---------\n");
    //arctan_tests_int();
     //printf("---------\n");
