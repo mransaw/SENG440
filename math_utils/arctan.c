@@ -33,7 +33,7 @@ void generate_linear_approximation(double min, double max, double inc) {
         double atan_result = atan(avg_x) * SCALE_OUT / M_PI;
         double percent_diff = 100 * fabs(slope_result - atan_result) / atan_result;
         //printf("    slope result = %f, atan result = %f\n, diff = %f, percent diff = %f\n", slope_result, atan_result, slope_result - atan_result, percent_diff);
-        intercepts[i] = interceptAverageWithinRange(slopes[i] / SLOPE_SF, lower_x, upper_x, inc / 5);
+        intercepts[i] = interceptAverageWithinRange(slopes[i] / SLOPE_SF, lower_x, upper_x, inc / 20000);
         int lower_X = lower_x * SCALE_IN;
         int upper_X = upper_x * SCALE_IN;
         if (lower_x == min) {
