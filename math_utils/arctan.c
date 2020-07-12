@@ -86,21 +86,85 @@ int int_arctan(int X) {
     double slope = 1;
     double intercept = 1;
 
-    if (-16384 <= X && X < -8192) { 
-    slope *= 1677; 
-    intercept *= -6601169; 
+    if (-16384 <= X && X < -14745) { 
+    slope *= 1371; 
+    intercept *= -11107592; 
     }
-    else if (-8192 <= X && X < -736) { 
-    slope *= 2418; 
-    intercept *= -370807; 
+    else if (-14745 <= X && X < -13107) { 
+    slope *= 1514; 
+    intercept *= -8998046; 
     }
-    else if (736 < X && X < 8192) { 
-    slope *= 2418; 
-    intercept *= 370807; 
+    else if (-13107 <= X && X < -11468) { 
+    slope *= 1669; 
+    intercept *= -6969148; 
     }
-    else if (8192 <= X && X < 16384) { 
-    slope *= 1677; 
-    intercept *= 6601169; 
+    else if (-11468 <= X && X < -9830) { 
+    slope *= 1833; 
+    intercept *= -5088702; 
+    }
+    else if (-9830 <= X && X < -8192) { 
+    slope *= 2001; 
+    intercept *= -3431659; 
+    }
+    else if (-8192 <= X && X < -6553) { 
+    slope *= 2167; 
+    intercept *= -2070212; 
+    }
+    else if (-6553 <= X && X < -4915) { 
+    slope *= 2322; 
+    intercept *= -1058192; 
+    }
+    else if (-4915 <= X && X < -3276) { 
+    slope *= 2452; 
+    intercept *= -411880; 
+    }
+    else if (-3276 <= X && X < -1638) { 
+    slope *= 2548; 
+    intercept *= -93139; 
+    }
+    else if (-1638 <= X && X < 0) { 
+    slope *= 2598; 
+    intercept *= -3531; 
+    }
+    else if (0 <= X && X < 1638) { 
+    slope *= 2598; 
+    intercept *= 3531; 
+    }
+    else if (1638 <= X && X < 3276) { 
+    slope *= 2548; 
+    intercept *= 93139; 
+    }
+    else if (3276 <= X && X < 4915) { 
+    slope *= 2452; 
+    intercept *= 411880; 
+    }
+    else if (4915 <= X && X < 6553) { 
+    slope *= 2322; 
+    intercept *= 1058192; 
+    }
+    else if (6553 <= X && X < 8191) { 
+    slope *= 2167; 
+    intercept *= 2070212; 
+    }
+    else if (8191 <= X && X < 9830) { 
+    slope *= 2001; 
+    intercept *= 3431659; 
+    }
+    else if (9830 <= X && X < 11468) { 
+    slope *= 1833; 
+    intercept *= 5088702; 
+    }
+    else if (11468 <= X && X < 13107) { 
+    slope *= 1669; 
+    intercept *= 6969148; 
+    }
+    else if (13107 <= X && X < 14745) { 
+    slope *= 1514; 
+    intercept *= 8998046; 
+    }
+    else if (14745 <= X && X < 16383) { 
+    slope *= 1371; 
+    intercept *= 11107592; 
     }
     return (slope * X + intercept);
 }

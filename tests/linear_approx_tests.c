@@ -138,7 +138,7 @@ void lin_sin_tests() {
 }
 
 int main(void) {
-//generate_linear_approximation(-1.0, 1.0, 0.5);
+//generate_linear_approximation(-1.0, 1.0, 0.1);
 arctan_tests();
    //printf("---------\n");
    //arctan_tests_int();
