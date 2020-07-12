@@ -12,7 +12,15 @@ double interceptAverageWithinRange(double slope, double lower_x, double upper_x,
         x += step;
         ++n;
     }
-    return (accumulate / n) * pow(2, SF_ATAN_OUT);
+    double b = 0;
+    double result = (accumulate / n) * pow(2, SF_ATAN_IN);
+    if (result < 0) {
+    printf("trace\n");
+        b = +17.775381;
+    } else {
+        b = -17.775381;
+    }
+    return result + b;
 }
 
 void generate_linear_approximation(double min, double max, double inc) {
@@ -37,10 +45,10 @@ void generate_linear_approximation(double min, double max, double inc) {
         int lower_X = lower_x * SCALE_IN;
         int upper_X = upper_x * SCALE_IN;
         if (lower_x == min) {
-            printf("if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x, upper_x , slopes[i]/SLOPE_SF, intercepts[i]/SCALE_OUT);
+            printf("if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x, upper_x , slopes[i], intercepts[i]);
         }
         else {
-            printf("else if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x , upper_x , slopes[i]/SLOPE_SF, intercepts[i]/SCALE_OUT);
+            printf("else if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x , upper_x , slopes[i], intercepts[i]);
         }
         upper_x += inc;
         lower_x += inc;
