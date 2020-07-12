@@ -7,25 +7,17 @@ double interceptAverageWithinRange(double slope, double lower_x, double upper_x,
     double accumulate = 0;
     double n = 1;
     while (x < upper_x) {
-        double atan_diff = atan(x) - (slope * x);
+        double atan_diff = (atan(x) * pow(2, SF_ATAN_OUT)/M_PI) - (slope * x * pow(2, SF_ATAN_IN));
         accumulate += atan_diff;
         x += step;
         ++n;
     }
-    double b = 0;
-    double result = (accumulate / n) * pow(2, SF_ATAN_IN);
-    if (result < 0) {
-    printf("trace\n");
-        b = +17.775381;
-    } else {
-        b = -17.775381;
-    }
-    return result + b;
+    return (accumulate / n);
 }
 
 void generate_linear_approximation(double min, double max, double inc) {
     double SCALE_IN = pow(2, SF_ATAN_IN);
-    double SCALE_OUT = pow(2, SF_ATAN_OUT);
+    double SCALE_OUT = pow(2, SF_ATAN_OUT) / M_PI;
     double SLOPE_SF = SCALE_OUT / SCALE_IN;
     int intervals = (max - min) / inc;
     double slopes[intervals];
@@ -36,12 +28,8 @@ void generate_linear_approximation(double min, double max, double inc) {
 
     while (upper_x <= max) {
         slopes[i] = SLOPE_SF * ((atan(upper_x) - atan(lower_x)) / (upper_x - lower_x));
-        double avg_x = (lower_x + upper_x) / 2.0;
-        double slope_result = (slopes[i] * (SCALE_IN));
-        double atan_result = atan(avg_x) * SCALE_OUT / M_PI;
-        double percent_diff = 100 * fabs(slope_result - atan_result) / atan_result;
         //printf("    slope result = %f, atan result = %f\n, diff = %f, percent diff = %f\n", slope_result, atan_result, slope_result - atan_result, percent_diff);
-        intercepts[i] = interceptAverageWithinRange(slopes[i] / SLOPE_SF, lower_x, upper_x, inc / 20000);
+        intercepts[i] = interceptAverageWithinRange(slopes[i], lower_x, upper_x, inc / 20000);
         int lower_X = lower_x * SCALE_IN;
         int upper_X = upper_x * SCALE_IN;
         if (lower_x == min) {
@@ -94,21 +82,21 @@ int int_arctan(int X) {
     double scale_out = pow(2, SF_ATAN_OUT) / M_PI;
     double slope = 1;
     double intercept = 1;
-    if (-16384 <= X && X < -8192) { 
-    slope *= 168689; 
-    intercept *= -2147483648; 
+    if (-1.000000 <= X && X < -0.500000) { 
+    slope *= 26847.840135; 
+    intercept *= -105618717.503956; 
     }
-    else if (-8192 <= X && X < 0) { 
-    slope *= 243084; 
-    intercept *= -2147483648; 
+    else if (-0.500000 <= X && X < 0.000000) { 
+    slope *= 38688.159865; 
+    intercept *= -5932926.354418; 
     }
-    else if (0 <= X && X < 8192) { 
-    slope *= 243084; 
-    intercept *= -2147483648; 
+    else if (0.000000 <= X && X < 0.500000) { 
+    slope *= 38688.159865; 
+    intercept *= 5932926.354418; 
     }
-    else if (8192 <= X && X < 16384) { 
-    slope *= 168689; 
-    intercept *= -1884066191; 
+    else if (0.500000 <= X && X < 1.000000) { 
+    slope *= 26847.840135; 
+    intercept *= 105618717.503956; 
     }
     return (slope * X + intercept);
 }
