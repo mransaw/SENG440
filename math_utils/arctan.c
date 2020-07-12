@@ -33,10 +33,10 @@ void generate_linear_approximation(double min, double max, double inc) {
         int lower_X = lower_x * SCALE_IN;
         int upper_X = upper_x * SCALE_IN;
         if (lower_x == min) {
-            printf("if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x, upper_x , slopes[i], intercepts[i]);
+            printf("if (%d <= X && X < %d) { \n slope *= %d; \n intercept *= %d; \n}\n", lower_X, upper_X , (int)(slopes[i]), (int)(intercepts[i]));
         }
         else {
-            printf("else if (%f <= X && X < %f) { \n slope *= %f; \n intercept *= %f; \n}\n", lower_x , upper_x , slopes[i], intercepts[i]);
+            printf("else if (%d <= X && X < %d) { \n slope *= %d; \n intercept *= %d; \n}\n", lower_X, upper_X, (int)(slopes[i]), (int)(intercepts[i]));
         }
         upper_x += inc;
         lower_x += inc;
@@ -66,7 +66,7 @@ void eval_error() {
 }
 
 int arctan(int X) {
-    return int_arctan(X) >> 1;
+    return int_arctan(X);
 }
 
 int arccot(int X) {
@@ -78,25 +78,29 @@ int adjust_angle(int arccot, int X) {
 }
 
 int int_arctan(int X) {
+    if (X == 0) {
+        return 0;
+    }
     double scale_in = pow(2, SF_ATAN_IN);
     double scale_out = pow(2, SF_ATAN_OUT) / M_PI;
     double slope = 1;
     double intercept = 1;
-    if (-1.000000 <= X && X < -0.500000) { 
-    slope *= 26847.840135; 
-    intercept *= -105618717.503956; 
+
+    if (-16384 <= X && X < -8192) { 
+    slope *= 1677; 
+    intercept *= -6601169; 
     }
-    else if (-0.500000 <= X && X < 0.000000) { 
-    slope *= 38688.159865; 
-    intercept *= -5932926.354418; 
+    else if (-8192 <= X && X < -736) { 
+    slope *= 2418; 
+    intercept *= -370807; 
     }
-    else if (0.000000 <= X && X < 0.500000) { 
-    slope *= 38688.159865; 
-    intercept *= 5932926.354418; 
+    else if (736 < X && X < 8192) { 
+    slope *= 2418; 
+    intercept *= 370807; 
     }
-    else if (0.500000 <= X && X < 1.000000) { 
-    slope *= 26847.840135; 
-    intercept *= 105618717.503956; 
+    else if (8192 <= X && X < 16384) { 
+    slope *= 1677; 
+    intercept *= 6601169; 
     }
     return (slope * X + intercept);
 }

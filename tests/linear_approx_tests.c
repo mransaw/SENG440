@@ -20,7 +20,7 @@ void arctan_tests() {
     printf("%d, %d\n", min_input, max_input);
     for (int X = min_input; X <= max_input; X += inc) {
         x = X / pow(2, SF_ATAN_IN);
-        r1 = atan(x) * pow(2, SF_ATAN_OUT) * (2 / M_PI);
+        r1 = atan(x) * pow(2, SF_ATAN_OUT) / M_PI;
         r2 = arctan(X);
         printf("atan(x = %f) * 2^14 / pi = %f, arctan(X = %d) = %f, diff = %f, percent error %f\n", x, r1, X, r2, r1 - r2, 100 * fabs(r2 - r1)/ r1);
     }
@@ -44,7 +44,7 @@ void arctan_tests_int(void) {
     // test minimum input
     int output = arctan(min_input); // function being tested
     double actual = atan2(min_element,1);
-    int want = actual * pow(2,SF_ATAN_OUT) * (2 / M_PI);    //-pi/2, scaled
+    int want = actual * pow(2,SF_ATAN_OUT) * M_PI;    //-pi/2, scaled
     
     printf("input: %d, output = %d, wanted: %d\n", min_input, output, want);
     
@@ -53,13 +53,13 @@ void arctan_tests_int(void) {
      
     if (error > MAX_ERROR_ATAN) {
         printf("integer arctan test failed for minimum input\n");   
-        return;      
+        //return;      
     }
     
     // test maximum input
     output = arctan(max_input); // function being tested
     actual = atan2(max_element,1);
-    want = actual * (2 / M_PI) * pow(2,SF_ATAN_OUT);    //pi/2, scaled
+    want = (actual / M_PI) * pow(2,SF_ATAN_OUT);    //pi/2, scaled
     
     printf("input: %d, output = %d, wanted: %d\n", max_input, output, want);
         
@@ -68,7 +68,7 @@ void arctan_tests_int(void) {
         
     if (error > MAX_ERROR_ATAN) {
         printf("integer arctan test failed for maximum input\n");         
-        return;
+        //return;
     }
     
     int nloops = 500,
@@ -84,7 +84,7 @@ void arctan_tests_int(void) {
         //test_vector_scaled[i] = loopf*pow(2,SF_ATAN_IN);
         double input = loopf * range;
         actual = atan(input);
-        want = (actual / M_PI) * pow(2,SF_ATAN_OUT);
+        want = actual * pow(2,SF_ATAN_OUT) / M_PI;
         
         printf("\ninput: %d(%f), output = %d, wanted: %d(%f)\n", scaled_input, input, output, want, actual);
         
@@ -93,7 +93,7 @@ void arctan_tests_int(void) {
             
         if (error > MAX_ERROR_ATAN) {
             printf("integer arctan test failed for input: %d(%f rads)\n\n", scaled_input, input);         
-            return;
+            //return;
         }
         
     }
