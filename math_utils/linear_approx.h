@@ -4,8 +4,8 @@ int int_arctan(int X);
 double d_arctan(double x);
 void generate_linear_approximation();
 int arctan(int x);
-int lin_sin(int theta);
-int lin_cos(int theta);
+int16_t lin_sin(int16_t theta);
+int16_t lin_cos(int16_t theta);
 #endif
 
 #define NPOINTS 300

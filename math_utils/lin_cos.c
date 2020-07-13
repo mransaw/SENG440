@@ -5,8 +5,8 @@
 
 #define Y_INT (1<<SF_ATAN_IN)    // magnitude of y-intercepts is 1, scaled
 
-int lin_cos(int theta) {
-    int result;    
+int16_t lin_cos(int16_t theta) {
+    int16_t result;    
     
     if (theta < 0) {
         result = SLOPE_SINCOS * theta + Y_INT;

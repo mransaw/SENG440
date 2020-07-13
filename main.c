@@ -8,33 +8,33 @@
 
 // TODO: #define IDENTITY_MATRIX_M
 
-void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M]);
-void transposeM(int source[M][M], int dest[M][M]);
-void print_matrix2(int matrix[2][2]);
-void print_matrixM(int matrix[M][M]);
-void print_descaled(int matrix[M][M]);
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
+void transposeM(int16_t source[M][M], int16_t dest[M][M]);
+void print_matrix2(int16_t matrix[2][2]);
+void print_matrixM(int16_t matrix[M][M]);
+void print_descaled(int16_t matrix[M][M]);
 
 int main(void) {
     // initialize done flag
     bool done = false;
     // initialize matrices
-    int input[M][M] = {
+    int16_t input[M][M] = {
         {31, 77, -11, 26},
         {-42, 14, 79, -53},
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
     };
-    // scale input matrix
+    /*// scale input matrix
     int mat_M[M][M];
     for (int i=0; i<M; i++) {
         for (int j=0; j<M; j++) {
             mat_M[i][j] = (input[i][j] << SF_ATAN_IN);
         }
-    }
+    }*/
     //print_descaled(mat_M);
     
     // scaled identity matrices
-    int U[M][M], Vt[M][M], I[M][M];
+    int16_t U[M][M], Vt[M][M], I[M][M];
     for (int i=0; i<M; i++) {
         for (int j=0; j<M; j++) {
             if (i != j) {
@@ -54,8 +54,8 @@ int main(void) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
-                int sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
-                int r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];           
+                int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
+                int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];           
                 //printf("i: %d, j: %d\n", i, j);
                 
                 // calculate rotation angles
@@ -187,8 +187,8 @@ int main(void) {
                 rsin = lin_sin(rtheta);
                 
                 // build rotation matrices
-                memcpy(r_U, I, M*M*sizeof(int));
-                memcpy(r_Vt, I, M*M*sizeof(int));
+                memcpy(r_U, I, M*M*sizeof(int16_t));
+                memcpy(r_Vt, I, M*M*sizeof(int16_t));
                 
                 r_U[i][i] = lcos;
                 r_U[i][j] = -lsin;
@@ -230,15 +230,15 @@ int main(void) {
     return EXIT_SUCCESS;
 }
 
-void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M]) {
-    int temp[M][M];
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]) {
+    int16_t temp[M][M];
     
     //print_matrixM(m1);
     //print_matrixM(m2);
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
-            int sum = 0;
+            int16_t sum = 0;
             for (int n=0; n<M; n++) {
                 sum += (m1[k][n]*m2[n][l]+(1<<(SF_ATAN_IN-1))) >> SF_ATAN_IN; // TODO: saturating addition
             }
@@ -248,23 +248,23 @@ void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M]) {
     
     //print_matrixM(temp);
     
-    memcpy(dest, temp, M*M*sizeof(int)); 
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
     return;
 }
 
-void transposeM(int source[M][M], int dest[M][M]) {
-    int result[M][M];
+void transposeM(int16_t source[M][M], int16_t dest[M][M]) {
+    int16_t result[M][M];
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             result[k][l] = source[l][k];
         }
     }
-    memcpy(dest, result, M*M*sizeof(int));
+    memcpy(dest, result, M*M*sizeof(int16_t));
     return;
 }
 
-void print_matrix2(int matrix[2][2]) {
+void print_matrix2(int16_t matrix[2][2]) {
     for (int k=0; k<2; k++) {
         for (int l=0; l<2; l++) {
             printf("%d ", matrix[k][l]);
@@ -275,7 +275,7 @@ void print_matrix2(int matrix[2][2]) {
     return;
 }
 
-void print_matrixM(int matrix[M][M]) {
+void print_matrixM(int16_t matrix[M][M]) {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             printf("%d ", matrix[k][l]);
@@ -286,7 +286,7 @@ void print_matrixM(int matrix[M][M]) {
     return;
 }
 
-void print_descaled(int matrix[M][M]) {
+void print_descaled(int16_t matrix[M][M]) {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             printf("%d ", (matrix[k][l] + SF_ATAN_IN-1) >> SF_ATAN_IN);
