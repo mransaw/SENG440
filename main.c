@@ -8,7 +8,10 @@
 #include <stdint.h>
 
 #define ITER 8
+#define KN 79595
 // TODO: #define IDENTITY_MATRIX_M
+
+// angles are calculated for SF_ATAN_OUT = (2^13)/pi
 static const int16_t angles[8] = {6434, 3798, 2007, 1019, 511, 256, 128, 64};
 
 void cordic(int16_t* cos, int16_t* sin, int16_t angle);
@@ -318,22 +321,22 @@ void cordic(int16_t* cos, int16_t* sin, int16_t theta) {
         }*/
     }
     
-    double A = 1;
+    /*double A = 1;
     for (int i=0; i<ITER; i++) {
         A *= sqrt(1 + pow(2,-2*i));
     }
     
-    double Kn = 1/A;
+    double Kn = 1/A;*/
     
-    //printf("A: %f, Kn: %f\n", A, Kn);
+    //printf("A: %f, Kn: %f\n", A, Kn);`
     
-    v[0] *= Kn;
-    v[1] *= Kn;
+    int temp_cos = v[0] * KN;
+    int temp_sin = v[1] * KN;
     
     //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
     
-    *cos = v[0];
-    *sin = v[1];
+    *cos = (int16_t)((temp_cos + (1<<16))>>17);
+    *sin = (int16_t)((temp_sin + (1<<16))>>17);
     return;
 }
 
