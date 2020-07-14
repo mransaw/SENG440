@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef N_BITS
 #define N_BITS 15
 int int_arctan(int X);
@@ -14,7 +16,7 @@ int16_t lin_cos(int16_t theta);
 #define SF_OUT 14  // output scale factor for arctan() is (2^SF_OUT)/pi 
 #define MAX_ERROR_ATAN 10   // arctan maximum error in %
 
-#define SF_ATAN_IN 14       // scale factor is 2^SF_ATAN_IN
+#define SF_ATAN_IN 13       // scale factor is 2^SF_ATAN_IN
 #define SF_ATAN_OUT 14      // scale factor is (2^SF_ATAN_OUT)/pi
 
 #define SLOPE_SINCOS (1<<(1+SF_ATAN_IN-SF_ATAN_OUT))    // magnitude of slopes is 2/pi, scaled

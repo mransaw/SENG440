@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 // TODO: #define IDENTITY_MATRIX_M
 
@@ -18,7 +19,7 @@ int main(void) {
     // initialize done flag
     bool done = false;
     // initialize matrices
-    int16_t input[M][M] = {
+    int16_t mat_M[M][M] = {
         {31, 77, -11, 26},
         {-42, 14, 79, -53},
         {-68, -10, 45, 90},
@@ -50,18 +51,25 @@ int main(void) {
     }   
     
     // sweeps
+    int sweeps = 0;
     while (!done) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
-                int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
-                int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];           
-                //printf("i: %d, j: %d\n", i, j);
+                int sum, sumb, diff, diffb, ltheta, rtheta;
+                int16_t lcos, lsin, rcos, rsin;
+                int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
+                
+                double theta_sum, theta_diff;
+                      
+                printf("i: %d, j: %d\n", i, j);
                 
                 // calculate rotation angles
                 // TODO: saturating addition?
+                
+                /*
                 sum = mat_M[j][i] + mat_M[i][j];
-                sumb = (mat_M[j][j] - mat_M[i][i] + SF_ATAN_IN-1) >> SF_ATAN_IN; 
+                sumb = mat_M[j][j] - mat_M[i][i]; 
                 if (sum > 0) {
                     if (sumb > 0) {
                         // Q1
@@ -95,31 +103,34 @@ int main(void) {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         return EXIT_FAILURE;
                     }
-                }
+                }*/
                 
-             /*   sum = input[j][j]-input[i][i];
-                if (sum != 0) {
-                    sum = (input[j][i]+input[i][j])/sum;
-                    printf("arctan input=%d, output=", sum);
-                    sum = lin_arctan(sum);
-                    printf("%d\n", sum);
+                sum = mat_M[j][i] + mat_M[i][j];
+                sumb = mat_M[j][j] - mat_M[i][i];
+                //printf("sum=%f, sumb=%f\n", (double)sum, (double)sumb);
+                if (sumb != 0) {
+                    theta_sum = atan((double)sum/sumb);
+                    //theta_sum = atan2((double)sum,(double)sumb);
+                    printf("arctan output=");
+                    //sum = lin_arctan(sum);
+                    sum = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
+                    printf("%f, scaled: %d\n", theta_sum, sum);
                 } else {
-                    int temp = input[j][i]+input[i][j];
-                    if (temp > 0) {
+                    if (sum > 0) {
                         // sum equals pi/2, scaled
                         sum = 1 << (SF_ATAN_OUT-1); 
-                    } else if (temp != 0) {
+                    } else if (sum < 0) {
                         // sum equals -pi/2, scaled
                         sum = -(1 << (SF_ATAN_OUT-1));    
                     } else {
-                        //sum = 0;
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         return EXIT_FAILURE;
                     }
-                }*/
+                }
                 
                 // TODO: saturating addition?
-                diff = mat_M[j][i] - mat_M[i][j];
+              
+                /*diff = mat_M[j][i] - mat_M[i][j];
                 diffb = (mat_M[j][j] + mat_M[i][i] + SF_ATAN_IN-1) >> SF_ATAN_IN; 
                 if (diff > 0) {
                     if (diffb > 0) {
@@ -154,37 +165,57 @@ int main(void) {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         return EXIT_FAILURE;
                     }
-                }
-                
-                /*diff = input[j][j]+input[i][i];
-                if (diff != 0) {
-                    diff = (input[j][i]-input[i][j])/diff;
-                    printf("arctan input=%d, output=", diff);
-                    diff = lin_arctan(diff);
-                    printf("%d\n\n", diff);
-                } else {
-                    int temp = input[j][i]-input[i][j];
-                    if (temp > 0) {
-                        // TODO: diff equals pi/2, scaled
-                    } else if (temp != 0) {
-                        // TODO: diff equals -pi/2, scaled
-                    } else {
-                        //diff = 0;
-                        printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        return EXIT_FAILURE;
-                    }
                 }*/
                 
-                ltheta = (sum - diff + 1) >> 1;   // TODO: saturating addition?
-                rtheta = (sum + diff + 1) >> 1;
+                diff = mat_M[j][i] - mat_M[i][j];
+                diffb = mat_M[j][j] + mat_M[i][i];
+                if (diffb != 0) {
+                    /*diff = (mat_M[j][i]-mat_M[i][j])/diff;
+                    printf("arctan input=%d, output=", diff);
+                    diff = lin_arctan(diff);
+                    printf("%d\n\n", diff);*/
+                    
+                    theta_diff = atan((double)diff/diffb);
+                    //theta_diff = atan2((double)diff,(double)diffb);
+                    printf("arctan output=");
+                    //sum = lin_arctan(sum);
+                    diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
+                    printf("%f, scaled: %d\n", theta_diff, diff);
+                } else {
+                    if (diff > 0) {
+                        // diff equals pi/2, scaled
+                        diff = 1 << (SF_ATAN_OUT-1);   
+                    } else if (diff < 0) {
+                        // diff equals -pi/2, scaled
+                        diff = -(1 << (SF_ATAN_OUT-1));   
+                    } else {
+                        printf("\nDANGER: input to arctan() is 0/0\n\n");
+                        printf("%d sweeps\n", sweeps);
+                        return EXIT_FAILURE;
+                    }
+                }
                 
-                printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n\n", sum, diff, ltheta, rtheta);
+                //ltheta = (sum - diff + 1) >> 1;   // TODO: saturating addition?
+                //rtheta = (sum + diff + 1) >> 1;
+                
+                double dltheta = (theta_sum - theta_diff) / 2;
+                double drtheta = (theta_sum + theta_diff) / 2;
+                
+                //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
+                printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
                 
                 // calculate rotation matrix elements
-                lcos = lin_cos(ltheta);
+               /* lcos = lin_cos(ltheta);
                 lsin = lin_sin(ltheta);
                 rcos = lin_cos(rtheta);
-                rsin = lin_sin(rtheta);
+                rsin = lin_sin(rtheta);*/
+                
+                lcos = (int16_t)(cos(dltheta)*pow(2,SF_ATAN_IN));
+                lsin = (int16_t)(sin(dltheta)*pow(2,SF_ATAN_IN));
+                rcos = (int16_t)(cos(drtheta)*pow(2,SF_ATAN_IN));
+                rsin = (int16_t)(sin(drtheta)*pow(2,SF_ATAN_IN));
+                
+                printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
                 
                 // build rotation matrices
                 memcpy(r_U, I, M*M*sizeof(int16_t));
@@ -203,14 +234,23 @@ int main(void) {
                 // apply rotations to M
                 dot_productM(r_U, mat_M, mat_M);
                 dot_productM(mat_M, r_Vt, mat_M);
-                print_descaled(mat_M);
+
+             
                 
                 // update U and V
                 transposeM(r_U, r_Ut);
                 dot_productM(U, r_Ut, U);
+
+                print_descaled(U);
                 
                 transposeM(r_Vt, r_V);
                 dot_productM(r_V, Vt, Vt);
+                
+                transposeM(Vt, r_V);
+                print_descaled(r_V);
+                
+                   print_matrixM(mat_M);
+                //return -1;
             }
         }
         //print_matrixM(mat_M);
@@ -219,34 +259,39 @@ int main(void) {
         for (int i=0; i<M; i++) {
             for (int j=0; j<M; j++) {
                 if (i != j) {
-                    if (mat_M[i][j] != 0) {
+                    if (abs(mat_M[i][j]) > 4) {
                         done = false;
                     }
                 }
             }
         }
-        return EXIT_SUCCESS; //TODO: remove after testing
-    }    
+        return -1; //TODO: remove after testing
+        sweeps++;
+    }
+    printf("%d sweeps\n", sweeps);
     return EXIT_SUCCESS;
 }
 
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]) {
     int16_t temp[M][M];
     
-    //print_matrixM(m1);
-    //print_matrixM(m2);
+    //print_descaled(m1);
+    //print_descaled(m2);
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
-            int16_t sum = 0;
+            int sum = 0;
             for (int n=0; n<M; n++) {
-                sum += (m1[k][n]*m2[n][l]+(1<<(SF_ATAN_IN-1))) >> SF_ATAN_IN; // TODO: saturating addition
+                sum += m1[k][n]*m2[n][l]; // TODO: saturating addition?
+              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
+               // printf("sum=%d\n\n, ", sum);
             }
-            temp[k][l] = sum;
+            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
+            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
-    //print_matrixM(temp);
+    //print_descaled(temp);
     
     memcpy(dest, temp, M*M*sizeof(int16_t)); 
     return;
@@ -289,7 +334,7 @@ void print_matrixM(int16_t matrix[M][M]) {
 void print_descaled(int16_t matrix[M][M]) {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
-            printf("%d ", (matrix[k][l] + SF_ATAN_IN-1) >> SF_ATAN_IN);
+            printf("%f ", (double)matrix[k][l]/pow(2,SF_ATAN_IN));
         }
         printf("\n");
     }

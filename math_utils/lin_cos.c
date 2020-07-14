@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <stdint.h>
 #include "linear_approx.h"
 
 #define Y_INT (1<<SF_ATAN_IN)    // magnitude of y-intercepts is 1, scaled
