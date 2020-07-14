@@ -7,12 +7,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define ITER 8
+#define ITER 6
 #define KN 79595
 // TODO: #define IDENTITY_MATRIX_M
 
 // angles are calculated for SF_ATAN_OUT = (2^13)/pi
-static const int16_t angles[8] = {6434, 3798, 2007, 1019, 511, 256, 128, 64};
+static const int16_t angles[8] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64};
 
 void cordic(int16_t* cos, int16_t* sin, int16_t angle);
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
