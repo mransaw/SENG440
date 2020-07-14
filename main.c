@@ -7,8 +7,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define ITER 8
 // TODO: #define IDENTITY_MATRIX_M
+static const int16_t angles[8] = {6434, 3798, 2007, 1019, 511, 256, 128, 64};
 
+void cordic(int16_t* cos, int16_t* sin, int16_t angle);
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
 void transposeM(int16_t source[M][M], int16_t dest[M][M]);
 void print_matrix2(int16_t matrix[2][2]);
@@ -209,12 +212,19 @@ int main(void) {
                 rcos = lin_cos(rtheta);
                 rsin = lin_sin(rtheta);*/
                 
-                lcos = (int16_t)(cos(dltheta)*pow(2,SF_ATAN_IN));
+
+                cordic(&lcos, &lsin, (int16_t)(dltheta*pow(2,SF_ATAN_IN)));
+                
+                cordic(&rcos, &rsin, (int16_t)(drtheta*pow(2,SF_ATAN_IN)));
+
+                //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
+                
+                /*lcos = (int16_t)(cos(dltheta)*pow(2,SF_ATAN_IN));
                 lsin = (int16_t)(sin(dltheta)*pow(2,SF_ATAN_IN));
                 rcos = (int16_t)(cos(drtheta)*pow(2,SF_ATAN_IN));
                 rsin = (int16_t)(sin(drtheta)*pow(2,SF_ATAN_IN));
                 
-                //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
+                printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));*/
                 
                 // build rotation matrices
                 memcpy(r_U, I, M*M*sizeof(int16_t));
@@ -233,8 +243,6 @@ int main(void) {
                 // apply rotations to M
                 dot_productM(r_U, mat_M, mat_M);
                 dot_productM(mat_M, r_Vt, mat_M);
-
-             
                 
                 // update U and V
                 transposeM(r_U, r_Ut);
@@ -252,13 +260,14 @@ int main(void) {
                 //return -1;
             }
         }
-        //print_matrixM(mat_M);
+        print_matrixM(mat_M);
         // check if M is close enough
         done = true;
         for (int i=0; i<M; i++) {
             for (int j=0; j<M; j++) {
                 if (i != j) {
-                    if (abs(mat_M[i][j]) > 4) {
+                    // TODO: determine what the maximum residual should be
+                    if (abs(mat_M[i][j]) > 8) {
                         done = false;
                     }
                 }
@@ -270,6 +279,62 @@ int main(void) {
     printf("%d sweeps\n", sweeps);
     print_matrixM(mat_M);
     return EXIT_SUCCESS;
+}
+
+void cordic(int16_t* cos, int16_t* sin, int16_t theta) {
+    // initialize sin/cos vector
+    int16_t v[2] = {(1<<SF_ATAN_IN), 0};
+    int angle;
+    
+    for (int j=0; j<ITER; j++) {
+        //int factor;
+        int16_t temp0 = v[0],
+                temp1 = v[1];
+                
+        angle = angles[j];
+        if (theta < 0) {
+            // needs SF
+            //factor = -(1 >> shiftf);
+            
+            v[0] += (temp1 >> j);
+            v[1] -= (temp0 >> j);
+            theta += angle;
+        } else {
+            //factor = (1 >> shiftf);
+            
+            v[0] -= (temp1 >> j);
+            v[1] += (temp0 >> j);
+            theta -= angle;
+        }
+        
+        //shiftf++;
+        //v[0] = v[0] - factor*v[1];
+        //v[1] = factor*temp + v[1];
+        
+        /*if ((j+1) > ANGLES_LENGTH) {
+            angle = (angle+1) >> 1;
+        } else {
+            angle = angles(j+1);
+        }*/
+    }
+    
+    double A = 1;
+    for (int i=0; i<ITER; i++) {
+        A *= sqrt(1 + pow(2,-2*i));
+    }
+    
+    double Kn = 1/A;
+    
+    //printf("A: %f, Kn: %f\n", A, Kn);
+    
+    v[0] *= Kn;
+    v[1] *= Kn;
+    
+    //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
+    
+    *cos = v[0];
+    *sin = v[1];
+    return;
 }
 
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]) {
