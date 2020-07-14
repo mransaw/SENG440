@@ -56,13 +56,12 @@ int main(void) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
-                int sum, sumb, diff, diffb, ltheta, rtheta;
-                int16_t lcos, lsin, rcos, rsin;
+                int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
                 double theta_sum, theta_diff;
                       
-                printf("i: %d, j: %d\n", i, j);
+                //printf("i: %d, j: %d\n", i, j);
                 
                 // calculate rotation angles
                 // TODO: saturating addition?
@@ -111,10 +110,10 @@ int main(void) {
                 if (sumb != 0) {
                     theta_sum = atan((double)sum/sumb);
                     //theta_sum = atan2((double)sum,(double)sumb);
-                    printf("arctan output=");
+                    //printf("arctan output=");
                     //sum = lin_arctan(sum);
                     sum = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
-                    printf("%f, scaled: %d\n", theta_sum, sum);
+                    //printf("%f, scaled: %d\n", theta_sum, sum);
                 } else {
                     if (sum > 0) {
                         // sum equals pi/2, scaled
@@ -177,10 +176,10 @@ int main(void) {
                     
                     theta_diff = atan((double)diff/diffb);
                     //theta_diff = atan2((double)diff,(double)diffb);
-                    printf("arctan output=");
+                    //printf("arctan output=");
                     //sum = lin_arctan(sum);
                     diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
-                    printf("%f, scaled: %d\n", theta_diff, diff);
+                    //printf("%f, scaled: %d\n", theta_diff, diff);
                 } else {
                     if (diff > 0) {
                         // diff equals pi/2, scaled
@@ -202,7 +201,7 @@ int main(void) {
                 double drtheta = (theta_sum + theta_diff) / 2;
                 
                 //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
-                printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
+                //printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
                 
                 // calculate rotation matrix elements
                /* lcos = lin_cos(ltheta);
@@ -215,7 +214,7 @@ int main(void) {
                 rcos = (int16_t)(cos(drtheta)*pow(2,SF_ATAN_IN));
                 rsin = (int16_t)(sin(drtheta)*pow(2,SF_ATAN_IN));
                 
-                printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
+                //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
                 
                 // build rotation matrices
                 memcpy(r_U, I, M*M*sizeof(int16_t));
@@ -241,15 +240,15 @@ int main(void) {
                 transposeM(r_U, r_Ut);
                 dot_productM(U, r_Ut, U);
 
-                print_descaled(U);
+                //print_descaled(U);
                 
                 transposeM(r_Vt, r_V);
                 dot_productM(r_V, Vt, Vt);
                 
                 transposeM(Vt, r_V);
-                print_descaled(r_V);
+                //print_descaled(r_V);
                 
-                   print_matrixM(mat_M);
+                //print_matrixM(mat_M);
                 //return -1;
             }
         }
@@ -265,10 +264,11 @@ int main(void) {
                 }
             }
         }
-        return -1; //TODO: remove after testing
+        //return -1; //TODO: remove after testing
         sweeps++;
     }
     printf("%d sweeps\n", sweeps);
+    print_matrixM(mat_M);
     return EXIT_SUCCESS;
 }
 
