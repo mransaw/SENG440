@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <time.h>
 
 #define ITER 6
 #define KN 79595
@@ -22,6 +23,11 @@ void print_matrixM(int16_t matrix[M][M]);
 void print_descaled(int16_t matrix[M][M]);
 
 int main(void) {
+    // clock variables for benchmarking
+    clock_t clk, clk_total,
+            clk_rota=0,
+            clk_angles=0;
+    
     // initialize done flag
     bool done = false;
     // initialize matrices
@@ -58,6 +64,9 @@ int main(void) {
     
     // sweeps
     int sweeps = 0;
+    
+    // start timer for SVD algorithm
+    clk_total = clock();
     while (!done) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
@@ -65,7 +74,7 @@ int main(void) {
                 int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
-                double theta_sum, theta_diff;
+                double theta_sum, theta_diff, dltheta, drtheta;
                       
                 //printf("i: %d, j: %d\n", i, j);
                 
@@ -109,6 +118,9 @@ int main(void) {
                         return EXIT_FAILURE;
                     }
                 }*/
+                
+                // start timer for rotation angle calculations
+                clk = clock();
                 
                 sum = mat_M[j][i] + mat_M[i][j];
                 sumb = mat_M[j][j] - mat_M[i][i];
@@ -203,8 +215,8 @@ int main(void) {
                 //ltheta = (sum - diff + 1) >> 1;   // TODO: saturating addition?
                 //rtheta = (sum + diff + 1) >> 1;
                 
-                double dltheta = (theta_sum - theta_diff) / 2;
-                double drtheta = (theta_sum + theta_diff) / 2;
+                dltheta = (theta_sum - theta_diff) / 2;
+                drtheta = (theta_sum + theta_diff) / 2;
                 
                 //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
                 //printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
@@ -219,6 +231,10 @@ int main(void) {
                 cordic(&lcos, &lsin, (int16_t)(dltheta*pow(2,SF_ATAN_IN)));
                 
                 cordic(&rcos, &rsin, (int16_t)(drtheta*pow(2,SF_ATAN_IN)));
+                
+                clk = clock() - clk;
+                clk_angles += clk;
+                printf("calculating rotation angles took %.0f [us]\n", 1000000*(double)clk/(CLOCKS_PER_SEC));
 
                 //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
                 
@@ -243,6 +259,9 @@ int main(void) {
                 r_Vt[i][j] = rsin;
                 r_Vt[j][j] = rcos;
                 
+                // start timer for matrix rotations and updating MUV
+                clk = clock();
+                
                 // apply rotations to M
                 dot_productM(r_U, mat_M, mat_M);
                 dot_productM(mat_M, r_Vt, mat_M);
@@ -257,6 +276,11 @@ int main(void) {
                 dot_productM(r_V, Vt, Vt);
                 
                 transposeM(Vt, r_V);
+                
+                clk = clock() - clk;
+                clk_rota += clk;
+                printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
+                
                 //print_descaled(r_V);
                 
                 //print_matrixM(mat_M);
@@ -279,7 +303,8 @@ int main(void) {
         //return -1; //TODO: remove after testing
         sweeps++;
     }
-    printf("%d sweeps\n", sweeps);
+    clk_total = clock() - clk_total;
+    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", sweeps, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*sweeps), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*sweeps));
     print_matrixM(mat_M);
     return EXIT_SUCCESS;
 }
