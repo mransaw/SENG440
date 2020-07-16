@@ -46,15 +46,13 @@ int main(void)
         for (int j=0; j<M; j++) {
             if (i != j) {
                 I[i][j] = 0;
-                U[i][j] = 0;
-                Vt[i][j] = 0;
             } else {
                 I[i][j] = (1<<SF_ATAN_IN);
-                U[i][j] = (1<<SF_ATAN_IN);
-                Vt[i][j] = (1<<SF_ATAN_IN);
             }
         }
     }   
+    memcpy(U, I, M*M*sizeof(int16_t));
+    memcpy(Vt, I, M*M*sizeof(int16_t));
     
     // count number of sweeps
     int sweeps = 0;
