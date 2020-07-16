@@ -63,11 +63,12 @@ int main(void)
         }
     }   
     
-    // sweeps
+    // count number of sweeps
     int sweeps = 0;
     
     // start timer for SVD algorithm
     clk_total = clock();
+    
     while (!done) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
@@ -83,44 +84,6 @@ int main(void)
                 // calculate rotation angles
                 // TODO: saturating addition?
                 
-                /*
-                sum = mat_M[j][i] + mat_M[i][j];
-                sumb = mat_M[j][j] - mat_M[i][i]; 
-                if (sum > 0) {
-                    if (sumb > 0) {
-                        // Q1
-                        sum = arctan(sum/sumb);
-                    } else if (sumb < 0) {
-                        // Q2: angle is pi - arctan(), scaled
-                        sum = (1<<SF_ATAN_OUT) - arctan(sum/sumb);
-                    } else {
-                        // angle is pi/2, scaled
-                        sum = 1 << (SF_ATAN_OUT-1);                                             
-                    }
-                } else if (sum < 0) {
-                    if (sumb < 0) {
-                        // Q3: angle is arctan() - pi, scaled
-                        sum = arctan(sum/sumb) - (1<<SF_ATAN_OUT);
-                    } else if (sumb > 0) {
-                        // Q4
-                        sum = arctan(sum/sumb);
-                    } else {
-                        // angle is -pi/2, scaled
-                        sum = -(1 << (SF_ATAN_OUT-1));                            
-                    }
-                } else {
-                    if (sumb > 0) {
-                        // angle is 0
-                        sum = 0;
-                    } else if (sumb < 0) {
-                        // angle is pi, scaled
-                        sum = 1 << SF_ATAN_OUT;
-                    } else {
-                        printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        return EXIT_FAILURE;
-                    }
-                }*/
-                
                 // start timer for rotation angle calculations
                 clk = clock();
                 
@@ -129,7 +92,6 @@ int main(void)
                 //printf("sum=%f, sumb=%f\n", (double)sum, (double)sumb);
                 if (sumb != 0) {
                     theta_sum = atan((double)sum/sumb);
-                    //theta_sum = atan2((double)sum,(double)sumb);
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
                     sum = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
@@ -149,43 +111,6 @@ int main(void)
                 
                 // TODO: saturating addition?
               
-                /*diff = mat_M[j][i] - mat_M[i][j];
-                diffb = (mat_M[j][j] + mat_M[i][i] + SF_ATAN_IN-1) >> SF_ATAN_IN; 
-                if (diff > 0) {
-                    if (diffb > 0) {
-                        // Q1
-                        diff = arctan(diff/diffb);
-                    } else if (diffb < 0) {
-                        // Q2: angle is pi - arctan(), scaled
-                        diff = (1<<SF_ATAN_OUT) - arctan(diff/diffb);
-                    } else {
-                        // angle is pi/2, scaled
-                        diff = 1 << (SF_ATAN_OUT-1);                                             
-                    }
-                } else if (diff < 0) {
-                    if (diffb < 0) {
-                        // Q3: angle is arctan() - pi, scaled
-                        diff = arctan(diff/diffb) - (1<<SF_ATAN_OUT);
-                    } else if (diffb > 0) {
-                        // Q4
-                        diff = arctan(diff/diffb);
-                    } else {
-                        // angle is -pi/2, scaled
-                        diff = -(1 << (SF_ATAN_OUT-1));                            
-                    }
-                } else {
-                    if (diffb > 0) {
-                        // angle is 0
-                        diff = 0;
-                    } else if (diffb < 0) {
-                        // angle is pi, scaled
-                        diff = 1 << SF_ATAN_OUT;
-                    } else {
-                        printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        return EXIT_FAILURE;
-                    }
-                }*/
-                
                 diff = mat_M[j][i] - mat_M[i][j];
                 diffb = mat_M[j][j] + mat_M[i][i];
                 if (diffb != 0) {
@@ -277,12 +202,11 @@ int main(void)
                 transposeM(r_Vt, r_V);
                 dot_productM(r_V, Vt, Vt);
                 
-                transposeM(Vt, r_V);
-                
                 clk = clock() - clk;
                 clk_rota += clk;
                 printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
                 
+                //transposeM(Vt, r_V);
                 //print_descaled(r_V);
                 
                 //print_matrixM(mat_M);
