@@ -31,6 +31,7 @@ int main(void)
     
     // initialize done flag
     bool done = false;
+    
     // initialize matrices
     int16_t mat_M[M][M] = {
         {31, 77, -11, 26},
@@ -38,14 +39,6 @@ int main(void)
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
     };
-    /*// scale input matrix
-    int mat_M[M][M];
-    for (int i=0; i<M; i++) {
-        for (int j=0; j<M; j++) {
-            mat_M[i][j] = (input[i][j] << SF_ATAN_IN);
-        }
-    }*/
-    //print_descaled(mat_M);
     
     // scaled identity matrices
     int16_t U[M][M], Vt[M][M], I[M][M];
