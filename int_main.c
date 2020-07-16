@@ -24,12 +24,20 @@ int main(void)
     bool done = false;
     
     // initialize matrices
-    int16_t mat_M[M][M] = {
+    int16_t mat_M[M][M];/* = {
         {31, 77, -11, 26},
         {-42, 14, 79, -53},
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
-    };
+    };*/
+    srand(time(0));
+    for (int i=0, i<M, i++) {
+        for (int j=0, j<M, j++) {
+            mat_M[i][j] = (rand() % (0x7F - 0x80 + 1)) + 0x80;
+        }
+    }
+    
+    print_matrixM(mat_M);
     
     // scaled identity matrices
     int16_t U[M][M], Vt[M][M], I[M][M];
