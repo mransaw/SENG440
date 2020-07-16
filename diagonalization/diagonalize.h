@@ -1,6 +1,4 @@
 #ifndef M
-#define M 4
-#define NUM_SWEEPS 4
 
 typedef struct svd_struct {
     double*** U;
@@ -20,8 +18,13 @@ void printout(const char * matrixName, double** matrix);
 void printoutSVD(SVD svd);
 #endif
 
+#include <stdint.h>
+#include <string.h>
+
 #define ITER 6
 #define KN 79595
+#define NUM_SWEEPS 4
+#define M 4
 
 extern const int16_t angles[6];
 

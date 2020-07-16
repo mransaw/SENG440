@@ -21,21 +21,21 @@ int main(void)
             clk_angles=0;
     
     // initialize done flag
-    bool done = false;
+    //bool done = false;
     
     // initialize matrices
-    int16_t mat_M[M][M];/* = {
+    int16_t mat_M[M][M] = {
         {31, 77, -11, 26},
         {-42, 14, 79, -53},
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
-    };*/
-    srand(time(0));
-    for (int i=0, i<M, i++) {
-        for (int j=0, j<M, j++) {
-            mat_M[i][j] = (rand() % (0x7F - 0x80 + 1)) + 0x80;
+    };
+   /* srand(time(0));
+    for (int i=0; i<M; i++) {
+        for (int j=0; j<M; j++) {
+            mat_M[i][j] = rand() + 0x8000;
         }
-    }
+    }*/
     
     print_matrixM(mat_M);
     
@@ -59,7 +59,8 @@ int main(void)
     // start timer for SVD algorithm
     clk_total = clock();
     
-    while (!done) {
+    //while (!done) {
+    for (int n=0; n<NUM_SWEEPS; n++) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
@@ -95,6 +96,8 @@ int main(void)
                         sum = -(1 << (SF_ATAN_OUT-1));    
                     } else {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
+                        printf("%d sweeps\n", sweeps);
+                        print_matrixM(mat_M);
                         return EXIT_FAILURE;
                     }
                 }
@@ -125,6 +128,7 @@ int main(void)
                     } else {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         printf("%d sweeps\n", sweeps);
+                        print_matrixM(mat_M);
                         return EXIT_FAILURE;
                     }
                 }
@@ -151,7 +155,7 @@ int main(void)
                 
                 clk = clock() - clk;
                 clk_angles += clk;
-                printf("calculating rotation angles took %.0f [us]\n", 1000000*(double)clk/(CLOCKS_PER_SEC));
+                //printf("calculating rotation angles took %.0f [us]\n", 1000000*(double)clk/(CLOCKS_PER_SEC));
 
                 //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
                 
@@ -194,7 +198,7 @@ int main(void)
                 
                 clk = clock() - clk;
                 clk_rota += clk;
-                printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
+                //printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
                 
                 //transposeM(Vt, r_V);
                 //print_descaled(r_V);
@@ -205,22 +209,23 @@ int main(void)
         }
         print_matrixM(mat_M);
         // check if M is close enough
-        done = true;
+        /*done = true;
         for (int i=0; i<M; i++) {
             for (int j=0; j<M; j++) {
                 if (i != j) {
                     // TODO: determine what the maximum residual should be
-                    if (abs(mat_M[i][j]) > 8) {
+                    if (abs(mat_M[i][j]) > 1000) {
                         done = false;
                     }
                 }
             }
         }
         //return -1; //TODO: remove after testing
-        sweeps++;
+        sweeps++;*/
     }
     clk_total = clock() - clk_total;
-    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", sweeps, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*sweeps), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*sweeps));
+    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*sweeps), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*sweeps));
     print_matrixM(mat_M);
+    
     return EXIT_SUCCESS;
 }
