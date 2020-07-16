@@ -22,7 +22,8 @@ void print_matrix2(int16_t matrix[2][2]);
 void print_matrixM(int16_t matrix[M][M]);
 void print_descaled(int16_t matrix[M][M]);
 
-int main(void) {
+int main(void)
+{
     // clock variables for benchmarking
     clock_t clk, clk_total,
             clk_rota=0,
@@ -71,6 +72,7 @@ int main(void) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
+                //int sum, sumb, diff, diffb, ltheta, rtheta;
                 int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
@@ -309,19 +311,21 @@ int main(void) {
     return EXIT_SUCCESS;
 }
 
-void cordic(int16_t* cos, int16_t* sin, int16_t theta) {
+void cordic(int16_t* cos, int16_t* sin, int16_t theta)
+{
     // initialize sin/cos vector
     int16_t v[2] = {(1<<SF_ATAN_IN), 0};
-    int angle;
+    int16_t angle;
     
     for (int j=0; j<ITER; j++) {
         //int factor;
+        // initialize temporary variables
         int16_t temp0 = v[0],
                 temp1 = v[1];
                 
+        // perform rotation
         angle = angles[j];
         if (theta < 0) {
-            // needs SF
             //factor = -(1 >> shiftf);
             
             v[0] += (temp1 >> j);
@@ -355,17 +359,19 @@ void cordic(int16_t* cos, int16_t* sin, int16_t theta) {
     
     //printf("A: %f, Kn: %f\n", A, Kn);`
     
+    // apply output factor Kn
     int temp_cos = v[0] * KN;
     int temp_sin = v[1] * KN;
     
     //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
-    
+    // remove added SF (from Kn) and return results
     *cos = (int16_t)((temp_cos + (1<<16))>>17);
     *sin = (int16_t)((temp_sin + (1<<16))>>17);
     return;
 }
 
-void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]) {
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
+{
     int16_t temp[M][M];
     
     //print_descaled(m1);
@@ -390,7 +396,8 @@ void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]) {
     return;
 }
 
-void transposeM(int16_t source[M][M], int16_t dest[M][M]) {
+void transposeM(int16_t source[M][M], int16_t dest[M][M])
+{
     int16_t result[M][M];
     
     for (int k=0; k<M; k++) {
@@ -402,7 +409,8 @@ void transposeM(int16_t source[M][M], int16_t dest[M][M]) {
     return;
 }
 
-void print_matrix2(int16_t matrix[2][2]) {
+void print_matrix2(int16_t matrix[2][2])
+{
     for (int k=0; k<2; k++) {
         for (int l=0; l<2; l++) {
             printf("%d ", matrix[k][l]);
@@ -413,7 +421,8 @@ void print_matrix2(int16_t matrix[2][2]) {
     return;
 }
 
-void print_matrixM(int16_t matrix[M][M]) {
+void print_matrixM(int16_t matrix[M][M])
+{
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             printf("%d ", matrix[k][l]);
@@ -424,7 +433,8 @@ void print_matrixM(int16_t matrix[M][M]) {
     return;
 }
 
-void print_descaled(int16_t matrix[M][M]) {
+void print_descaled(int16_t matrix[M][M])
+{
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             printf("%f ", (double)matrix[k][l]/pow(2,SF_ATAN_IN));
