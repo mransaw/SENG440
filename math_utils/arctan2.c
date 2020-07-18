@@ -21,24 +21,53 @@ int angles[] = {
 };
 
 double d_angles[] = {
-    45.00,
-    26.56,
-    14.04,
-    7.13,
-    3.58,
-    1.79,
-    0.89,
-    0.45
+    45.000000,
+    26.565051,
+    14.036243,
+    7.125016,
+    3.576334,
+    1.789911,
+    0.895174,
+    0.447614,
+    0.223811,
+    0.111906,
+    0.055953,
+    0.027976,
+    0.013988,
+    0.006994,
+    0.003497,
+    0.001749
+};
+
+int int_angles[] = {
+    435241,
+    229969,
+    116736,
+    58594,
+    29325,
+    14666,
+    7333,
+    3666,
+    1833,
+    916,
+    458,
+    229,
+    114,
+    57,
+    28
 };
 
 void generate_angles_table() {
-    int max_angle = (1 << SF_ATAN_IN) * M_PI / 4;
-    for (int i = max_angle; i >= 0; i /= 2) {
+    double max_angle = M_PI / 4;
+    int k = 0;
+    for (double i = 1; k < 16; i /= 2) {
+        ++k;
+        double angle = d_angles[k] * pow(2, SF_ATAN_OUT);
         if (i == 0) {
-            printf("    %d\n", i);
+            printf("    %f\n", angle);
             break;
         }
-        printf("    %d,\n", i);
+        printf("    %f,\n", angle);
     }
 }
 
@@ -47,11 +76,12 @@ void d_generate_angles_table() {
     int k = 0;
     for (double i = 1; k < 16; i /= 2) {
         ++k;
+        double angle = atan(i) * 180 / M_PI;
         if (i == 0) {
-            printf("    %f\n", atan(pow(2, i)));
+            printf("    %f\n", angle);
             break;
         }
-        printf("    %f,\n", atan(pow(2, i)));
+        printf("    %f,\n", angle);
     }
 }
 
@@ -72,59 +102,36 @@ double d_arctan2(double y, double x) {
         double delta_y = + (sigma * (pow(2, -i)) * x_);;
         x_ = x_ + delta_x;
         y_ = y_ + delta_y;
-        //printf("x = %f\n", delta_x);
-        //printf("y = %f\n", delta_y);
-        //printf("z = %f\n", -(sigma * d_angles[i]));
         z = z - (sigma * d_angles[i]);
-        printf("\nx = %f\n y = %f\n z = %f\n\n", x_, y_, z);
+        //printf("\nx = %f\n y = %f\n z = %f\n\n", x_, y_, z);
     }
-    printf("result: %f, expected: %f\n", z, atan2(y, x)*180/M_PI);
+    printf("result: %f, expected: %f\n", z, atan2(y, x) * 180 / M_PI);
     return z;
 }
 
 int arctan2(int Y, int X) {
-    return 0;
-    int result = 0;
-    int X_ = 0;
-    int Y_ = 0;
-    int sum = 0;
+    int z = 0;
+    int sigma = 1;
+    printf("z = %d\n", z);
+    int X_ = X;
+    int Y_ = Y;
     for (int i = 0; i < 16; ++i) {
-        printf("sum = %d\n", sum);
-        if (Y > 0) {
-            X_ = X + (Y >> i);
-            Y_ = Y - (X >> i);
-            printf("X_ = %d\n", X_);
-            printf("Y_ = %d\n", Y_);
-            sum += angles[i];
-        } else if (Y < 0) {
-            X_ = X - (Y >> i);
-            Y_ = Y + (X >> i);
-            printf("X_ = %d\n", X_);
-            printf("Y_ = %d\n", Y_);
-            sum -= angles[i];
+        if (Y_ >= 0) {
+            sigma = -1.0;
+        } else {
+            sigma = 1.0;
         }
+        int delta_x = - (sigma * (pow(2, -i)) * Y_);
+        int delta_y = + (sigma * (pow(2, -i)) * X_);;
+        X_ = X_ + delta_x;
+        Y_ = Y_ + delta_y;
+        z = z - (sigma * int_angles[i]);
+        printf("int_angles[%d] = %d\n", i, int_angles[i]);
+        printf("\nX = %d\n Y = %d\n Z = %d\n\n", X_, Y_, z);
     }
-    printf("result = %f\n", (double)sum / (1 << SF_ATAN_IN) / M_PI);
-    return sum;
+    double unscaled_result = ((double)z)/(pow(2, SF_ATAN_OUT)/M_PI);
+    double expected = atan2(Y, X) *  180 / M_PI;
+    printf("result: %f, expected: %f\n", unscaled_result, expected);
+    printf("percent error: %f\n", 100*(unscaled_result - expected)/expected);
+    return z;
 }
-
-//int d_arctan2(int Y, int X) {
-//    int result = 0;
-//    int X_ = 0;
-//    int Y_ = 0;
-//    int sum = 0;
-//    for (int i = 0; i < 16; ++i) {
-//        printf("sum = %d\n", sum);
-//        if (Y > 0) {
-//            X_ = X + (Y >> i);
-//            Y_ = Y - (X >> i);
-//            sum += angles[i];
-//        } else if (Y < 0) {
-//            X_ = X - (Y >> i);
-//            Y_ = Y + (X >> i);
-//            sum -= angles[i];
-//        }
-//    }
-//    printf("result = %f\n", (double)sum);
-//    return sum;
-//}

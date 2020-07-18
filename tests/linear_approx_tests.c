@@ -31,7 +31,7 @@ void arctan_tests_int(void) {
         max_element = 8192;
     // ^^^ above is only true for the first iteration of sweep 1 ^^^ */
     
-    // max unscaled value of matrix elements is (2^31)/(2^SF_ATAN_IN)
+    // max unscaled value of matrix elements is 2^16
     int min_element = -(1 << (32-SF_ATAN_IN)),
         max_element = 1 << (32-SF_ATAN_IN);   
        
@@ -138,17 +138,22 @@ void lin_sin_tests() {
 }
 
 int main(void) {
-
-    double x = 200;
-    double y = 100;
-    d_arctan2(y, x);
+    //arctan_tests();
+   //printf("---------\n");
+   arctan_tests_int();
+   
+    //generate_angles_table();
+    //double x = -16384;
+    //double y = 16384;
+    //printf("\n");
+    //d_arctan2(y, x);
+    //printf("\n");
+    //arctan2(y, x);
+    //printf("\n");
     //int Y = y * (1 << SF_ATAN_IN);
     //int X = x * (1 << SF_ATAN_IN);
     //arctan2(Y, X);
-//generate_linear_approximation(-1.0, 1.0, 0.1);
-//arctan_tests();
-   //printf("---------\n");
-   //arctan_tests_int();
+
     //printf("---------\n");
  //   
     // generate test vectors for sin/cos
