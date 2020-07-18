@@ -1,5 +1,8 @@
 #ifndef N_BITS
 #define N_BITS 15
+void d_generate_angles_table();
+double d_arctan2(double y, double x);
+int arctan2(int Y, int X);
 int int_arctan(int X);
 void basic_linear_approximation();
 void generate_linear_approximation();

@@ -138,8 +138,15 @@ void lin_sin_tests() {
 }
 
 int main(void) {
+
+    double x = 200;
+    double y = 100;
+    d_arctan2(y, x);
+    //int Y = y * (1 << SF_ATAN_IN);
+    //int X = x * (1 << SF_ATAN_IN);
+    //arctan2(Y, X);
 //generate_linear_approximation(-1.0, 1.0, 0.1);
-arctan_tests();
+//arctan_tests();
    //printf("---------\n");
    //arctan_tests_int();
     //printf("---------\n");
