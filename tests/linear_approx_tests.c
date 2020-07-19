@@ -76,7 +76,7 @@ int main() {
     arctan_tests();
    
     // generate test vectors for sin/cos
-   /* for (int i=0; i<NPOINTS; i++) {
+    for (int i=0; i<NPOINTS; i++) {
         double loopf = 2 * (double)i/(NPOINTS) - 1;
         //printf("loopf is: %f\n", loopf);
         // regular test vector
@@ -84,12 +84,12 @@ int main() {
         // test vector from -pi to pi, scaled
         test_vector_scaled[i] = loopf*pow(2,SF_ATAN_OUT);
         //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
-    }  */
+    }  
 //
  //   // run sin/cos tests
- //   lin_cos_tests();
-   // printf("---------\n");
-   // lin_sin_tests();
+   lin_cos_tests();
+    printf("---------\n");
+    lin_sin_tests();
  //   //printf("---------\n");
     //return 0;
 }

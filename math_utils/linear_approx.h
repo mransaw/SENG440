@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef N_BITS
 #define N_BITS 15
 int divide_by_subraction(int Y, int X);
@@ -9,8 +11,8 @@ int int_arctan(int X);
 void basic_linear_approximation();
 void generate_linear_approximation();
 int arctan(int x);
-int lin_sin(int theta);
-int lin_cos(int theta);
+int16_t lin_sin(int16_t theta);
+int16_t lin_cos(int16_t theta);
 #endif
 
 #define NPOINTS 300
