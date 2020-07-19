@@ -1,6 +1,6 @@
 #ifndef N_BITS
 #define N_BITS 15
-int divide_by_multiply(int Y, int X);
+int divide_by_subraction(int Y, int X);
 void generate_angles_table();
 void d_generate_angles_table();
 double d_arctan2(double y, double x);

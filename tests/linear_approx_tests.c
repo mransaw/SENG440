@@ -68,10 +68,11 @@ void lin_sin_tests() {
 }
 
 int main() {
-    //int n = 2;
-    //int d = 5; 
-    //int div = divide_by_multiply(n << SF_ATAN_IN, d << SF_ATAN_IN);
-    //printf("div = %d, expected = %f\n", div, ((double)n) / ((double)d));
+    //int n = -3;
+    //int d = 2; 
+    //int div = divide_by_subraction(n << SF_ATAN_IN, d << SF_ATAN_IN);
+    //int expected = (int)((n << SF_ATAN_IN) / d);
+    //printf("div = %d, expected = %d\n", div, expected);
     arctan_tests();
    
     // generate test vectors for sin/cos

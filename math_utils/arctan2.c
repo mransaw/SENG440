@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #define HALF_UNIT_CIRCLE_DEGREES 180
+#define SCALED_PI 51471 // 3.14 * pow(2, 14)
 
 int angles[] = {
     12867,
@@ -58,58 +59,6 @@ int int_angles[] = {
     28
 };
 
-void generate_angles_table() {
-    double max_angle = M_PI / 4;
-    int k = 0;
-    for (double i = 1; k < 16; i /= 2) {
-        ++k;
-        double angle = d_angles[k] * pow(2, SF_ATAN_OUT);
-        if (i == 0) {
-            printf("    %f\n", angle);
-            break;
-        }
-        printf("    %f,\n", angle);
-    }
-}
-
-void d_generate_angles_table() {
-    double max_angle = M_PI / 4;
-    int k = 0;
-    for (double i = 1; k < 16; i /= 2) {
-        ++k;
-        double angle = atan(i) * 180 / M_PI;
-        if (i == 0) {
-            printf("    %f\n", angle);
-            break;
-        }
-        printf("    %f,\n", angle);
-    }
-}
-
-double d_arctan2(double y, double x) {
-    printf("x= %f, y = %f\n", x, y);
-    double z = 0;
-    double sigma = 1.0;
-    printf("z = %f\n", z);
-    double x_ = x;
-    double y_ = y;
-    for (int i = 0; i < 16; ++i) {
-        if (y_ >= 0) {
-            sigma = -1.0;
-        } else {
-            sigma = 1.0;
-        }
-        double delta_x = - (sigma * (pow(2, -i)) * y_);
-        double delta_y = + (sigma * (pow(2, -i)) * x_);;
-        x_ = x_ + delta_x;
-        y_ = y_ + delta_y;
-        z = z - (sigma * d_angles[i]);
-        //printf("\nx = %f\n y = %f\n z = %f\n\n", x_, y_, z);
-    }
-    printf("result: %f, expected: %f\n", z, atan2(y, x) * 180 / M_PI);
-    return z;
-}
-
 int phase_shift(int Y, int X, int z) {
     int adjusted_z = z;
     if (X <= 0 && Y <= 0) { // quadrant 3
@@ -118,39 +67,36 @@ int phase_shift(int Y, int X, int z) {
     return adjusted_z;
 }
 
-int divide_by_multiply(int Y, int X) {
-    if (X == 0) {
-        return 0;
+// division method assuming N and D are of similar magnitude 
+int divide_by_subraction(int N, int D) { /// inputs are Q16.14 (31 bit signed integers)
+    N = N << SF_ATAN_IN;
+    int Q = 0;
+    int R = 0;
+    int n = N - D;
+    if (N < 0 && D > 0) { // negative N and positive D, take negative of result with positive args
+        int _N = -(N >> SF_ATAN_IN);
+        return -divide_by_subraction(_N, D); // N must be scaled back, before being passed back into recursion
+    } else if (D < 0) { // positive N and negative D, or both negative: take result with flipped sign args
+        int _N = -(N >> SF_ATAN_IN); // N must be scaled back, before being passed back into recursion
+        int _D = -D;
+        return divide_by_subraction(_N, _D);
     }
-    //int lower = -1 * (1 << ((SF_ATAN_IN * 2 )- 1));
-    //int upper = (1 << ((SF_ATAN_IN * 2) - 1)) - 1;
-    //int result = (lower + upper) >> 1;
-    //int challenger = 1;
-    //int delta = 0;
-    //while (1) {
-    //    printf("challenger = %d\n", challenger);
-    //    printf("result = %d\n", result);
-    //    printf("X = %d\n", X);
-    //    printf("result * X = %f, Y = %d\n", result * X, Y);
-    //    challenger = (result * X) - Y;
-    //    if (challenger > delta) {
-    //        upper = result;
-    //        result = (lower + upper) >> 1;
-    //    } else if (challenger < delta) {
-    //        lower = result;
-    //        result = (lower + upper) >> 1;
-    //    } else {
-    //        break;
-    //    }
-    //}
-    //return result >> SF_ATAN_IN; // adjustment for squared scale factor upon muliplication
-    return (Y << SF_ATAN_IN)/X;
+    while (n > 0) {
+        n -= D;
+        if (n > 0) {
+            ++Q; // only increment Q if the next loop is guaranteed to run, when n > 0
+        } else {
+            R = n;
+            break;
+        }
+    }
+    return Q; // returns quotient of N / D, scaled by 2^SF_ATAN_IN
 }
 
 int lin_arctan(int Y, int X) {
-    int div_YX = divide_by_multiply(Y, X);
+    int div_YX = divide_by_subraction(Y, X);
     int scale_in = 1 << SF_ATAN_IN;
-    int scale_out = divide_by_multiply((1 << SF_ATAN_IN),  M_PI * pow(2, SF_ATAN_IN));
+    int scale_out = divide_by_subraction((1 << SF_ATAN_IN), SCALED_PI);
     int slope = 1;
     int intercept = 1;
 
@@ -274,6 +220,6 @@ int arctan2(int Y, int X) {
     } else {
         z = cordic_arctan(Y, X);
     }
-    z = divide_by_multiply(z, 180 << SF_ATAN_IN);
+    z = divide_by_subraction(z, 180 << SF_ATAN_IN);
     return z;
 }
