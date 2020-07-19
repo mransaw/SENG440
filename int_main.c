@@ -117,7 +117,7 @@ int main(void)
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
                     //diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
-                    diff = atan2(diff, diffb);
+                    diff = arctan2(diff, diffb);
                     //printf("%f, scaled: %d\n", theta_diff, diff);
                 } else {
                     if (diff > 0) {
