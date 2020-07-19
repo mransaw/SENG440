@@ -1,6 +1,7 @@
 #include <linear_approx.h>
 #include <stdio.h>
 #include <math.h>
+#define HALF_UNIT_CIRCLE_DEGREES 180
 
 int angles[] = {
     12867,
@@ -109,29 +110,42 @@ double d_arctan2(double y, double x) {
     return z;
 }
 
-int arctan2(int Y, int X) {
+int phase_shift(int Y, int X, int z) {
+    int adjusted_z = z;
+    if (X <= 0 && Y <= 0) { // quadrant 3
+        adjusted_z = z + HALF_UNIT_CIRCLE_DEGREES;
+    }
+    return adjusted_z;
+}
+
+int cordic_arctan(int Y, int X) {
     int z = 0;
-    int sigma = 1;
-    printf("z = %d\n", z);
     int X_ = X;
     int Y_ = Y;
+    int delta_x = 0;
+    int delta_y = 0;
     for (int i = 0; i < 16; ++i) {
         if (Y_ >= 0) {
-            sigma = -1.0;
+            delta_x = + (Y_ >> i);
+            delta_y = - (X_ >> i);
+            X_ = X_ + delta_x;
+            Y_ = Y_ + delta_y;
+            z = z + int_angles[i]; // Q16.15 - Q16.15 --> Q16.15 result
         } else {
-            sigma = 1.0;
+            delta_x = - (Y_ >> i);
+            delta_y = + (X_ >> i);
+            X_ = X_ + delta_x;
+            Y_ = Y_ + delta_y;
+            z = z - int_angles[i]; // Q16.15 - Q16.15 --> Q16.15 result
         }
-        int delta_x = - (sigma * (pow(2, -i)) * Y_);
-        int delta_y = + (sigma * (pow(2, -i)) * X_);;
-        X_ = X_ + delta_x;
-        Y_ = Y_ + delta_y;
-        z = z - (sigma * int_angles[i]);
-        printf("int_angles[%d] = %d\n", i, int_angles[i]);
-        printf("\nX = %d\n Y = %d\n Z = %d\n\n", X_, Y_, z);
     }
-    double unscaled_result = ((double)z)/(pow(2, SF_ATAN_OUT)/M_PI);
-    double expected = atan2(Y, X) *  180 / M_PI;
-    printf("result: %f, expected: %f\n", unscaled_result, expected);
-    printf("percent error: %f\n", 100*(unscaled_result - expected)/expected);
-    return z;
+    return phase_shift(Y, X, z);
+}
+
+int arctan2(int Y, int X) {
+    if (Y - X <= 0) {
+        return lin_arctan(Y, X);
+    } else {
+        return cordic_arctan(Y, X);
+    }
 }
