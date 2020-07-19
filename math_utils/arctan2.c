@@ -118,6 +118,129 @@ int phase_shift(int Y, int X, int z) {
     return adjusted_z;
 }
 
+int divide_by_multiply(int Y, int X) {
+    if (X == 0) {
+        return 0;
+    }
+    //int lower = -1 * (1 << ((SF_ATAN_IN * 2 )- 1));
+    //int upper = (1 << ((SF_ATAN_IN * 2) - 1)) - 1;
+    //int result = (lower + upper) >> 1;
+    //int challenger = 1;
+    //int delta = 0;
+    //while (1) {
+    //    printf("challenger = %d\n", challenger);
+    //    printf("result = %d\n", result);
+    //    printf("X = %d\n", X);
+    //    printf("result * X = %f, Y = %d\n", result * X, Y);
+    //    challenger = (result * X) - Y;
+    //    if (challenger > delta) {
+    //        upper = result;
+    //        result = (lower + upper) >> 1;
+    //    } else if (challenger < delta) {
+    //        lower = result;
+    //        result = (lower + upper) >> 1;
+    //    } else {
+    //        break;
+    //    }
+    //}
+    //return result >> SF_ATAN_IN; // adjustment for squared scale factor upon muliplication
+    return (Y << SF_ATAN_IN)/X;
+}
+
+int lin_arctan(int Y, int X) {
+    int div_YX = divide_by_multiply(Y, X);
+    int scale_in = 1 << SF_ATAN_IN;
+    int scale_out = divide_by_multiply((1 << SF_ATAN_IN),  M_PI * pow(2, SF_ATAN_IN));
+    int slope = 1;
+    int intercept = 1;
+
+    if (-16384 <= div_YX && div_YX < -14745) { 
+    slope *= 1371; 
+    intercept *= -11107592; 
+    }
+    else if (-14745 <= div_YX && div_YX < -13107) { 
+    slope *= 1514; 
+    intercept *= -8998046; 
+    }
+    else if (-13107 <= div_YX && div_YX < -11468) { 
+    slope *= 1669; 
+    intercept *= -6969148; 
+    }
+    else if (-11468 <= div_YX && div_YX < -9830) { 
+    slope *= 1833; 
+    intercept *= -5088702; 
+    }
+    else if (-9830 <= div_YX && div_YX < -8192) { 
+    slope *= 2001; 
+    intercept *= -3431659; 
+    }
+    else if (-8192 <= div_YX && div_YX < -6553) { 
+    slope *= 2167; 
+    intercept *= -2070212; 
+    }
+    else if (-6553 <= div_YX && div_YX < -4915) { 
+    slope *= 2322; 
+    intercept *= -1058192; 
+    }
+    else if (-4915 <= div_YX && div_YX < -3276) { 
+    slope *= 2452; 
+    intercept *= -411880; 
+    }
+    else if (-3276 <= div_YX && div_YX < -1638) { 
+    slope *= 2548; 
+    intercept *= -93139; 
+    }
+    else if (-1638 <= div_YX && div_YX < 0) { 
+    slope *= 2598; 
+    intercept *= -3531; 
+    }
+    else if (div_YX == 0) {
+        slope = 0;
+        intercept = 0;
+    }
+    else if (0 < div_YX && div_YX < 1638) { 
+    slope *= 2598; 
+    intercept *= 3531; 
+    }
+    else if (1638 <= div_YX && div_YX < 3276) { 
+    slope *= 2548; 
+    intercept *= 93139; 
+    }
+    else if (3276 <= div_YX && div_YX < 4915) { 
+    slope *= 2452; 
+    intercept *= 411880; 
+    }
+    else if (4915 <= div_YX && div_YX < 6553) { 
+    slope *= 2322; 
+    intercept *= 1058192; 
+    }
+    else if (6553 <= div_YX && div_YX < 8191) { 
+    slope *= 2167; 
+    intercept *= 2070212; 
+    }
+    else if (8191 <= div_YX && div_YX < 9830) { 
+    slope *= 2001; 
+    intercept *= 3431659; 
+    }
+    else if (9830 <= div_YX && div_YX < 11468) { 
+    slope *= 1833; 
+    intercept *= 5088702; 
+    }
+    else if (11468 <= div_YX && div_YX < 13107) { 
+    slope *= 1669; 
+    intercept *= 6969148; 
+    }
+    else if (13107 <= div_YX && div_YX < 14745) { 
+    slope *= 1514; 
+    intercept *= 8998046; 
+    }
+    else if (14745 <= div_YX && div_YX < 16383) { 
+    slope *= 1371; 
+    intercept *= 11107592; 
+    }
+    return (slope * div_YX + intercept);
+}
+
 int cordic_arctan(int Y, int X) {
     int z = 0;
     int X_ = X;
@@ -143,9 +266,14 @@ int cordic_arctan(int Y, int X) {
 }
 
 int arctan2(int Y, int X) {
-    if (Y - X <= 0) {
-        return lin_arctan(Y, X);
+    int z = 0;
+    if (Y == -8192 || X == -8192) {
+        z = 90;
+    }else if (Y - X <= 0) {
+        z = lin_arctan(Y, X);
     } else {
-        return cordic_arctan(Y, X);
+        z = cordic_arctan(Y, X);
     }
+    z = divide_by_multiply(z, 180 << SF_ATAN_IN);
+    return z;
 }

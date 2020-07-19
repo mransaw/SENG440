@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int UPPER_BOUND = 1 << SF_ATAN_IN;
 static double test_vector[NPOINTS];
@@ -21,7 +22,7 @@ void arctan_tests() {
                 int scaled_result = arctan2(Y, X);
                 double unscaled_result = ((double)scaled_result) * M_PI / pow(2, SF_ATAN_OUT);
                 double result = unscaled_result;
-                double expected = atan(y/x) * 180 / M_PI;
+                double expected = atan(y/x) / M_PI;
                 double error_percent = 100 * (result - expected) / expected;
                 if (error_percent > 10) {
                     printf("our result: %f\n expected result: %f\n percent error: %f\n----------------------\n", result, expected, error_percent);
@@ -67,24 +68,12 @@ void lin_sin_tests() {
 }
 
 int main() {
+    //int n = 2;
+    //int d = 5; 
+    //int div = divide_by_multiply(n << SF_ATAN_IN, d << SF_ATAN_IN);
+    //printf("div = %d, expected = %f\n", div, ((double)n) / ((double)d));
     arctan_tests();
-   //printf("---------\n");
-   //arctan_tests_int();
    
-    //generate_angles_table();
-    //double x = 200;
-    //double y = 800;
-    //printf("\n");
-    //d_arctan2(y, x);
-    //printf("\n");
-    //arctan2(y, x);
-    //printf("\n");
-    //int Y = y * (1 << SF_ATAN_IN);
-    //int X = x * (1 << SF_ATAN_IN);
-    //arctan2(Y, X);
-
-    //printf("---------\n");
- //   
     // generate test vectors for sin/cos
    /* for (int i=0; i<NPOINTS; i++) {
         double loopf = 2 * (double)i/(NPOINTS) - 1;
