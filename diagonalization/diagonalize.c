@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // angles are calculated for SF_ATAN_OUT = (2^15)/pi
-const int cs_angles[8] = {25736, 15193, 8027, 4075, 2045, 1024, 512, 246};
+const int cs_angles[8] = {8192, 4836, 2555, 1297, 651, 326, 163, 81};
 //const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
 
 void initIdentityMatrix(double** matrix) {
