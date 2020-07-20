@@ -8,8 +8,7 @@ void d_generate_angles_table();
 double d_arctan2(double y, double x);
 int arctan2(int Y, int X);
 int int_arctan(int X);
-void basic_linear_approximation();
-void generate_linear_approximation();
+void generate_linear_approximation(double min, double max, double inc);
 int arctan(int x);
 int16_t lin_sin(int16_t theta);
 int16_t lin_cos(int16_t theta);
@@ -22,6 +21,6 @@ int16_t lin_cos(int16_t theta);
 #define MAX_ERROR_ATAN 10   // arctan maximum error in %
 
 #define SF_ATAN_IN 14      // scale factor is 2^SF_ATAN_IN
-#define SF_ATAN_OUT 15     // scale factor is (2^SF_ATAN_OUT) / pi
+#define SF_ATAN_OUT 15     // scale factor is (2^SF_ATAN_OUT-1) / pi
 
 #define SLOPE_SINCOS (1<<(1+SF_ATAN_OUT - SF_ATAN_IN))    // magnitude of slopes is 2/pi, scaled

@@ -16,16 +16,14 @@ void arctan_tests() {
     for (double x = min_input; x < max_input; x += inc) {
         if (x != 0) {
             for (double y = min_input; y < max_input; y += inc) {
-                printf("y = %f, x = %f\n", y, x);
                 int Y = y * pow(2, SF_ATAN_IN);
                 int X = x * pow(2, SF_ATAN_IN);
-                int scaled_result = arctan2(Y, X);
-                double unscaled_result = ((double)scaled_result) * M_PI / pow(2, SF_ATAN_OUT);
-                double result = unscaled_result;
-                double expected = atan(y/x) / M_PI;
-                double error_percent = 100 * (result - expected) / expected;
-                if (abs(error_percent) > 10) {
-                    printf("our result: %f\n expected result: %f\n percent error: %f\n----------------------\n", result, expected, error_percent);
+                int result = arctan2(Y, X);
+                double expected = (atan(y/x) * pow(2, SF_ATAN_OUT));
+                double error_percent = 100 * ((((double)result) - expected) / expected) / pow(2, SF_ATAN_OUT);
+                printf("y = %f, x = %f, y/x = %f, \n      our result: %d\n expected result: %f\n percent error: %f\n", y, x, y/x, result, expected, error_percent);
+                if (fabs(error_percent) > 10) {
+                    printf("        TEST FAIL\n----------------------\n");
                 }
             }
         }
@@ -73,6 +71,7 @@ int main() {
     //int div = divide_by_subraction(n << SF_ATAN_IN, d << SF_ATAN_IN);
     //int expected = (int)((n << SF_ATAN_IN) / d);
     //printf("div = %d, expected = %d\n", div, expected);
+    //generate_linear_approximation(-1.0, 1.0, 0.1);
     arctan_tests();
    
  /*   // generate test vectors for sin/cos

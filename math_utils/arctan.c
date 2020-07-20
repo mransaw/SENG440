@@ -7,7 +7,7 @@ double interceptAverageWithinRange(double slope, double lower_x, double upper_x,
     double accumulate = 0;
     double n = 1;
     while (x < upper_x) {
-        double atan_diff = (atan(x) * pow(2, SF_ATAN_OUT)/M_PI) - (slope * x * pow(2, SF_ATAN_IN));
+        double atan_diff = (atan(x) * pow(2, SF_ATAN_OUT-1)/M_PI) - (slope * x * pow(2, SF_ATAN_IN));
         accumulate += atan_diff;
         x += step;
         ++n;
@@ -17,7 +17,7 @@ double interceptAverageWithinRange(double slope, double lower_x, double upper_x,
 
 void generate_linear_approximation(double min, double max, double inc) {
     double SCALE_IN = pow(2, SF_ATAN_IN);
-    double SCALE_OUT = pow(2, SF_ATAN_OUT) / M_PI;
+    double SCALE_OUT = pow(2, SF_ATAN_OUT);
     double SLOPE_SF = SCALE_OUT / SCALE_IN;
     int intervals = (max - min) / inc;
     double slopes[intervals];
@@ -27,7 +27,7 @@ void generate_linear_approximation(double min, double max, double inc) {
     int i = 0;
 
     while (upper_x <= max) {
-        slopes[i] = SLOPE_SF * ((atan(upper_x) - atan(lower_x)) / (upper_x - lower_x));
+        slopes[i] = SLOPE_SF * pow(2, SF_ATAN_OUT) * ((atan(upper_x) - atan(lower_x)) / (upper_x - lower_x));
         //printf("    slope result = %f, atan result = %f\n, diff = %f, percent diff = %f\n", slope_result, atan_result, slope_result - atan_result, percent_diff);
         intercepts[i] = interceptAverageWithinRange(slopes[i], lower_x, upper_x, inc / 20000);
         int lower_X = lower_x * SCALE_IN;

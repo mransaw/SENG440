@@ -3,24 +3,7 @@
 #include <math.h>
 #define HALF_UNIT_CIRCLE_DEGREES 180
 #define SCALED_PI 51471 // 3.14 * pow(2, 14)
-
-int angles[] = {
-    12867,
-    6433,
-    3216,
-    1608,
-    804,
-    402,
-    201,
-    100,
-    50,
-    25,
-    12,
-    6,
-    3,
-    1,
-    0
-};
+#define SCALE_IN (1 << SF_ATAN_IN)
 
 double d_angles[] = {
     45.000000,
@@ -41,22 +24,23 @@ double d_angles[] = {
     0.001749
 };
 
-int int_angles[] = {
-    435241,
-    229969,
-    116736,
-    58594,
-    29325,
-    14666,
-    7333,
-    3666,
-    1833,
-    916,
-    458,
-    229,
-    114,
-    57,
-    28
+int int_angles[] = { // radians * pow(2, SF_ATAN_OUT)
+    25736,
+    15193,
+    8027,
+    4075,
+    2045,
+    1024,
+    512,
+    256,
+    128,
+    64,
+    32,
+    16,
+    8,
+    4,
+    2,
+    1
 };
 
 int phase_shift(int Y, int X, int z) {
@@ -95,8 +79,6 @@ int divide_by_subraction(int N, int D) { /// inputs are Q16.14 (31 bit signed in
 
 int lin_arctan(int Y, int X) {
     int div_YX = divide_by_subraction(Y, X);
-    int scale_in = 1 << SF_ATAN_IN;
-    int scale_out = divide_by_subraction((1 << SF_ATAN_IN), SCALED_PI);
     int slope = 1;
     int intercept = 1;
 
@@ -212,14 +194,14 @@ int cordic_arctan(int Y, int X) {
 }
 
 int arctan2(int Y, int X) {
+    printf("--------\nY = %d, X = %d\n", Y, X);
     int z = 0;
-    if (Y == -8192 || X == -8192) {
-        z = 90;
-    }else if (Y - X <= 0) {
-        z = lin_arctan(Y, X);
-    } else {
-        z = cordic_arctan(Y, X);
+    if (-SCALE_IN < Y && Y < SCALE_IN) {
+        return 0;
+    } else if (X == -8192) {
+        return -51471;
     }
-    z = divide_by_subraction(z, 180 << SF_ATAN_IN);
+    z = cordic_arctan(Y, X);
+
     return z;
 }
