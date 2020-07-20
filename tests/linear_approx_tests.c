@@ -24,7 +24,7 @@ void arctan_tests() {
                 double result = unscaled_result;
                 double expected = atan(y/x) / M_PI;
                 double error_percent = 100 * (result - expected) / expected;
-                if (error_percent > 10) {
+                if (abs(error_percent) > 10) {
                     printf("our result: %f\n expected result: %f\n percent error: %f\n----------------------\n", result, expected, error_percent);
                 }
             }
@@ -75,7 +75,7 @@ int main() {
     //printf("div = %d, expected = %d\n", div, expected);
     arctan_tests();
    
-    // generate test vectors for sin/cos
+ /*   // generate test vectors for sin/cos
     for (int i=0; i<NPOINTS; i++) {
         double loopf = 2 * (double)i/(NPOINTS) - 1;
         //printf("loopf is: %f\n", loopf);
@@ -89,7 +89,7 @@ int main() {
  //   // run sin/cos tests
    lin_cos_tests();
     printf("---------\n");
-    lin_sin_tests();
+    lin_sin_tests();*/
  //   //printf("---------\n");
     //return 0;
 }
