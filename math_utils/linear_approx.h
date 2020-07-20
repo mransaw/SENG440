@@ -2,14 +2,7 @@
 
 #ifndef N_BITS
 #define N_BITS 15
-int divide_by_subraction(int Y, int X);
-void generate_angles_table();
-void d_generate_angles_table();
-double d_arctan2(double y, double x);
 int arctan2(int Y, int X);
-int int_arctan(int X);
-void generate_linear_approximation(double min, double max, double inc);
-int arctan(int x);
 int16_t lin_sin(int16_t theta);
 int16_t lin_cos(int16_t theta);
 #endif
