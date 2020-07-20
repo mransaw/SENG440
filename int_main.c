@@ -112,11 +112,12 @@ int main(void)
                     diff = lin_arctan(diff);
                     printf("%d\n\n", diff);*/
                     
-                    theta_diff = atan((double)diff/diffb);
+                    //theta_diff = atan((double)diff/diffb);
                     //theta_diff = atan2((double)diff,(double)diffb);
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
-                    diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
+                    //diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
+                    diff = arctan2(diff, diffb);
                     //printf("%f, scaled: %d\n", theta_diff, diff);
                 } else {
                     if (diff > 0) {
