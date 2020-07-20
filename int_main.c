@@ -10,8 +10,9 @@
 
 // TODO: #define IDENTITY_MATRIX_M
 
-// angles are calculated for SF_ATAN_OUT = (2^13)/pi
-const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64};
+// angles are calculated for SF_ATAN_OUT = (2^15)/pi
+const int16_t angles[6] = {25736, 15193, 8027, 4075, 2045, 1024};
+//const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
 
 int main(void)
 {
