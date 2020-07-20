@@ -4,6 +4,10 @@
 #include <math.h>
 #include <stdio.h>
 
+// angles are calculated for SF_ATAN_OUT = (2^15)/pi
+const int cs_angles[8] = {25736, 15193, 8027, 4075, 2045, 1024, 512, 246};
+//const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
+
 void initIdentityMatrix(double** matrix) {
     for (int i = 0; i < M; ++i) {
         matrix[i] = (double*)malloc(sizeof(double*) * M);
@@ -189,11 +193,11 @@ void printoutSVD(const SVD svd) {
 }
 
 
-void cordic(int16_t* cos, int16_t* sin, int16_t theta)
+void cordic(int16_t* cos, int16_t* sin, int theta)
 {
     // initialize sin/cos vector
     int16_t v[2] = {(1<<SF_ATAN_IN), 0};
-    int16_t angle;
+    int angle;
     
     for (int j=0; j<ITER; j++) {
         //int factor;
@@ -202,7 +206,7 @@ void cordic(int16_t* cos, int16_t* sin, int16_t theta)
                 temp1 = v[1];
                 
         // perform rotation
-        angle = angles[j];
+        angle = cs_angles[j];
         if (theta < 0) {
             //factor = -(1 >> shiftf);
             

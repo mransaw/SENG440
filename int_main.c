@@ -10,10 +10,6 @@
 
 // TODO: #define IDENTITY_MATRIX_M
 
-// angles are calculated for SF_ATAN_OUT = (2^15)/pi
-const int16_t angles[6] = {25736, 15193, 8027, 4075, 2045, 1024};
-//const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
-
 int main(void)
 {
     // clock variables for benchmarking
@@ -66,6 +62,7 @@ int main(void)
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
+                int theta_s, theta_d;
                 int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
@@ -82,19 +79,19 @@ int main(void)
                 sum = mat_M[j][i] + mat_M[i][j];
                 sumb = mat_M[j][j] - mat_M[i][i];
                 //printf("sum=%f, sumb=%f\n", (double)sum, (double)sumb);
+                theta_sum = atan((double)sum/sumb);
                 if (sumb != 0) {
-                    theta_sum = atan((double)sum/sumb);
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
-                    sum = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
+                    theta_s = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
                     //printf("%f, scaled: %d\n", theta_sum, sum);
                 } else {
                     if (sum > 0) {
                         // sum equals pi/2, scaled
-                        sum = 1 << (SF_ATAN_OUT-1); 
+                        theta_s = 1 << (SF_ATAN_OUT-1); 
                     } else if (sum < 0) {
                         // sum equals -pi/2, scaled
-                        sum = -(1 << (SF_ATAN_OUT-1));    
+                        theta_s = -(1 << (SF_ATAN_OUT-1));    
                     } else {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         printf("%d sweeps\n", sweeps);
@@ -107,26 +104,28 @@ int main(void)
               
                 diff = mat_M[j][i] - mat_M[i][j];
                 diffb = mat_M[j][j] + mat_M[i][i];
+                
+                theta_diff = atan((double)diff/diffb);
                 if (diffb != 0) {
                     /*diff = (mat_M[j][i]-mat_M[i][j])/diff;
                     printf("arctan input=%d, output=", diff);
                     diff = lin_arctan(diff);
                     printf("%d\n\n", diff);*/
                     
-                    //theta_diff = atan((double)diff/diffb);
+                   
                     //theta_diff = atan2((double)diff,(double)diffb);
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
-                    //diff = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
-                    diff = arctan2(diff, diffb);
+                    theta_d = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
+                    //theta_d = arctan2(diff, diffb);
                     //printf("%f, scaled: %d\n", theta_diff, diff);
                 } else {
                     if (diff > 0) {
                         // diff equals pi/2, scaled
-                        diff = 1 << (SF_ATAN_OUT-1);   
+                        theta_d = 1 << (SF_ATAN_OUT-1);   
                     } else if (diff < 0) {
                         // diff equals -pi/2, scaled
-                        diff = -(1 << (SF_ATAN_OUT-1));   
+                        theta_d = -(1 << (SF_ATAN_OUT-1));   
                     } else {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
                         printf("%d sweeps\n", sweeps);
@@ -151,9 +150,9 @@ int main(void)
                 rsin = lin_sin(rtheta);*/
                 
 
-                cordic(&lcos, &lsin, (int16_t)(dltheta*pow(2,SF_ATAN_IN)));
+                cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)));
                 
-                cordic(&rcos, &rsin, (int16_t)(drtheta*pow(2,SF_ATAN_IN)));
+                cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)));
                 
                 clk = clock() - clk;
                 clk_angles += clk;

@@ -26,9 +26,9 @@ void printoutSVD(SVD svd);
 #define NUM_SWEEPS 4
 #define M 4
 
-extern const int16_t angles[6];
+extern const int cs_angles[8];
 
-void cordic(int16_t* cos, int16_t* sin, int16_t angle);
+void cordic(int16_t* cos, int16_t* sin, int angle);
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
 void transposeM(int16_t source[M][M], int16_t dest[M][M]);
 void print_matrix2(int16_t matrix[2][2]);
