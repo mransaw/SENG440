@@ -194,12 +194,21 @@ int cordic_arctan(int Y, int X) {
 }
 
 int arctan2(int Y, int X) {
-    printf("--------\nY = %d, X = %d\n", Y, X);
     int z = 0;
-    if (-SCALE_IN < Y && Y < SCALE_IN) {
+    if (Y == X) {
+        return SCALED_PI >> 1;
+    }
+    else if (-SCALE_IN < Y && Y < SCALE_IN) {
         return 0;
-    } else if (X == -8192) {
-        return -51471;
+    } else if (X == -8192 || X == 8192) {
+        int sign  = 1;
+        if (Y > 0) {
+            sign = -1;
+        }
+        return sign * 51471;
+    }
+    if (Y < 0) {
+        
     }
     z = cordic_arctan(Y, X);
 

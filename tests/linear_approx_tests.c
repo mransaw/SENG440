@@ -9,22 +9,27 @@ static double test_vector[NPOINTS];
 static int test_vector_scaled[NPOINTS];
 
 void arctan_tests() {
-    // 16-bit floating point input limits
-    double min_input = -1 * pow(2, 16);
-    double max_input = pow(2, 16) - 1;
-    double inc = (max_input - min_input) / 16;
-    for (double x = min_input; x < max_input; x += inc) {
+    // 16-bit floating point input limits, for quadrants I and IV only (quadrants II and III are unnecessary in Jacobi method)
+    double min_x = 0;
+    double max_x = pow(2, 16 - 1) - 1;
+    double min_y = -pow(2, 16 - 1);
+    double max_y = pow(2, 16 - 1) - 1;
+    double x_inc = (max_x - min_x) / 16;
+    double y_inc = (max_y - min_y) / 16;
+
+    for (double x = min_x; x < max_x; x += x_inc) {
         if (x != 0) {
-            for (double y = min_input; y < max_input; y += inc) {
+            for (double y = min_y; y < max_y; y += y_inc) {
                 int Y = y * pow(2, SF_ATAN_IN);
                 int X = x * pow(2, SF_ATAN_IN);
-                int result = arctan2(Y, X);
-                double expected = (atan(y/x) * pow(2, SF_ATAN_OUT));
-                double error_percent = 100 * ((((double)result) - expected) / expected) / pow(2, SF_ATAN_OUT);
-                printf("y = %f, x = %f, y/x = %f, \n      our result: %d\n expected result: %f\n percent error: %f\n", y, x, y/x, result, expected, error_percent);
-                if (fabs(error_percent) > 10) {
+                printf("Y = %d, X = %d\n", Y, X);
+                double result = ((double)arctan2(Y, X)) / pow(2, SF_ATAN_OUT);
+                double expected = (atan(y/x));
+                double error_percent = 100 * ((result - expected) / expected);
+                if (fabs(error_percent) > 10 && fabs(result - expected) > 0.001) {
                     printf("        TEST FAIL\n----------------------\n");
                 }
+                printf("y = %f, x = %f, y/x = %f, \n      our unscaled result: %f\n expected unscaled result: %f\n percent error: %f\n------------------\n", y, x, y/x, (double)result, expected, error_percent);
             }
         }
     }
