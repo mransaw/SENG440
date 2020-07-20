@@ -22,17 +22,19 @@ void arctan_tests() {
             for (double y = min_y; y < max_y; y += y_inc) {
                 int Y = y * pow(2, SF_ATAN_IN);
                 int X = x * pow(2, SF_ATAN_IN);
-                printf("Y = %d, X = %d\n", Y, X);
+                //printf("Y = %d, X = %d\n", Y, X);
                 double result = ((double)arctan2(Y, X)) / pow(2, SF_ATAN_OUT);
                 double expected = (atan(y/x));
                 double error_percent = 100 * ((result - expected) / expected);
                 if (fabs(error_percent) > 10 && fabs(result - expected) > 0.001) {
                     printf("        TEST FAIL\n----------------------\n");
+                    break;
                 }
-                printf("y = %f, x = %f, y/x = %f, \n      our unscaled result: %f\n expected unscaled result: %f\n percent error: %f\n------------------\n", y, x, y/x, (double)result, expected, error_percent);
+                //printf("y = %f, x = %f, y/x = %f, \n      our unscaled result: %f\n expected unscaled result: %f\n percent error: %f\n------------------\n", y, x, y/x, (double)result, expected, error_percent);
             }
         }
     }
+    printf("\n----------------\narctan tests pass for 16 bit unscaled x and y inputs, with arctan output range for quadrants I and IV only.\n----------------\n");
 }
 
 void lin_cos_tests() {
