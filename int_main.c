@@ -150,9 +150,9 @@ int main(void)
                 rsin = lin_sin(rtheta);*/
                 
 
-                cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)));
+                cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)/M_PI));
                 
-                cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)));
+                cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)/M_PI));
                 
                 clk = clock() - clk;
                 clk_angles += clk;
