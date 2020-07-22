@@ -62,8 +62,8 @@ int main(void)
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
-                int theta_s, theta_d;
-                int16_t sum, sumb, diff, diffb, ltheta, rtheta, lcos, lsin, rcos, rsin;
+                int theta_s, theta_d, ltheta, rtheta;
+                int16_t sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
                 double theta_sum, theta_diff, dltheta, drtheta;
@@ -78,13 +78,12 @@ int main(void)
                 
                 sum = mat_M[j][i] + mat_M[i][j];
                 sumb = mat_M[j][j] - mat_M[i][i];
-                //printf("sum=%f, sumb=%f\n", (double)sum, (double)sumb);
+                //printf("sum=%d, sumb=%d\n", sum, sumb);
                 theta_sum = atan((double)sum/sumb);
                 if (sumb != 0) {
-                    //printf("arctan output=");
                     //sum = lin_arctan(sum);
-                    theta_s = (int16_t)(theta_sum * pow(2,SF_ATAN_OUT)/M_PI);
-                    //printf("%f, scaled: %d\n", theta_sum, sum);
+                    theta_s = arctan2(sum, sumb);
+                    //printf("arctan output=%f, scaled: %d\n", theta_sum, theta_s);
                 } else {
                     if (sum > 0) {
                         // sum equals pi/2, scaled
@@ -116,7 +115,7 @@ int main(void)
                     //theta_diff = atan2((double)diff,(double)diffb);
                     //printf("arctan output=");
                     //sum = lin_arctan(sum);
-                    theta_d = (int16_t)(theta_diff * pow(2,SF_ATAN_OUT)/M_PI);
+                    theta_d = arctan2(diff, diffb);
                     //theta_d = arctan2(diff, diffb);
                     //printf("%f, scaled: %d\n", theta_diff, diff);
                 } else {
@@ -134,8 +133,8 @@ int main(void)
                     }
                 }
                 
-                //ltheta = (sum - diff + 1) >> 1;   // TODO: saturating addition?
-                //rtheta = (sum + diff + 1) >> 1;
+                ltheta = (theta_s - theta_d + 1) >> 1;   // TODO: saturating addition?
+                rtheta = (theta_s + theta_d + 1) >> 1;
                 
                 dltheta = (theta_sum - theta_diff) / 2;
                 drtheta = (theta_sum + theta_diff) / 2;
@@ -150,9 +149,11 @@ int main(void)
                 rsin = lin_sin(rtheta);*/
                 
 
-                cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)/M_PI));
+                //cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)/M_PI));
+                cordic(&lcos, &lsin, ltheta);
                 
-                cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)/M_PI));
+                //cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)/M_PI));
+                cordic(&rcos, &rsin, rtheta);
                 
                 clk = clock() - clk;
                 clk_angles += clk;
@@ -225,7 +226,7 @@ int main(void)
         sweeps++;*/
     }
     clk_total = clock() - clk_total;
-    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*sweeps), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*sweeps));
+    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*NUM_SWEEPS));
     print_matrixM(mat_M);
     
     return EXIT_SUCCESS;

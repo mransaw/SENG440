@@ -21,12 +21,12 @@ void printoutSVD(SVD svd);
 #include <stdint.h>
 #include <string.h>
 
-#define ITER 6
+#define ITER 14
 #define KN 79595
 #define NUM_SWEEPS 4
 #define M 4
 
-extern const int cs_angles[8];
+extern const int angles[14];
 
 void cordic(int16_t* cos, int16_t* sin, int angle);
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
