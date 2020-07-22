@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // angles are calculated for SF_ATAN_OUT = (2^15)/pi
-const int cs_angles[8] = {8192, 4836, 2555, 1297, 651, 326, 163, 81};
+const int angles[14] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41, 20, 10, 5, 3, 1};
 //const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
 
 void initIdentityMatrix(double** matrix) {
@@ -103,7 +103,7 @@ void applyRotations(SVD svd, int i, int j, double theta_l, double theta_r) {
     transpose(V__T, *svd.V); // V' = transpose(V'_t)
     printoutSVD(svd);
 }
-
+/*
 void applyJacobiMethod(SVD svd, int i, int j) {
         int m_ii = (*svd.S)[i][i];
         int m_ji = (*svd.S)[j][i];
@@ -171,7 +171,7 @@ SVD diagonalize(double** matrix) {
     }
 
     return svd;
-}
+}*/
 
 void printout(const char * matrixName, double** matrix) {
     printf("----------------------------------\n");
@@ -206,7 +206,7 @@ void cordic(int16_t* cos, int16_t* sin, int theta)
                 temp1 = v[1];
                 
         // perform rotation
-        angle = cs_angles[j];
+        angle = angles[j];
         if (theta < 0) {
             //factor = -(1 >> shiftf);
             
