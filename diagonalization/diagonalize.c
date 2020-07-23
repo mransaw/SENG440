@@ -252,9 +252,9 @@ void cordic(int16_t* cos, int16_t* sin, int theta)
     return;
 }
 
-void dot_productM(int16_t m1[restrict M][restrict M], int16_t m2[restrict M][restrict M], int16_t dest[restrict M][restrict M])
+void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[M][M])
 {
-    //int16_t temp[M][M];
+    int16_t temp[M][M];
     
     //print_descaled(m1);
     //print_descaled(m2);
@@ -268,26 +268,26 @@ void dot_productM(int16_t m1[restrict M][restrict M], int16_t m2[restrict M][res
                // printf("sum=%d\n\n, ", sum);
             }
             //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
-            dest[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
     //print_descaled(temp);
     
-    //memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
     return;
 }
 
-void transposeM(int16_t source[M][M], int16_t dest[restrict M][restrict M])
+void transposeM(int16_t source[restrict M][M], int16_t dest[M][M])
 {
-    //int16_t result[M][M];
+    int16_t result[M][M];
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
-            dest[k][l] = source[l][k];
+            result[k][l] = source[l][k];
         }
     }
-    //memcpy(dest, result, M*M*sizeof(int16_t));
+    memcpy(dest, result, M*M*sizeof(int16_t));
     return;
 }
 
