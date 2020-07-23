@@ -66,7 +66,7 @@ int main(void)
                 int16_t sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
-                double theta_sum, theta_diff, dltheta, drtheta;
+                //double theta_sum, theta_diff, dltheta, drtheta;
                       
                 //printf("i: %d, j: %d\n", i, j);
                 
@@ -79,7 +79,7 @@ int main(void)
                 sum = mat_M[j][i] + mat_M[i][j];
                 sumb = mat_M[j][j] - mat_M[i][i];
                 //printf("sum=%d, sumb=%d\n", sum, sumb);
-                theta_sum = atan((double)sum/sumb);
+                //theta_sum = atan((double)sum/sumb);
                 if (sumb != 0) {
                     //sum = lin_arctan(sum);
                     theta_s = arctan2(sum, sumb);
@@ -104,7 +104,7 @@ int main(void)
                 diff = mat_M[j][i] - mat_M[i][j];
                 diffb = mat_M[j][j] + mat_M[i][i];
                 
-                theta_diff = atan((double)diff/diffb);
+                //theta_diff = atan((double)diff/diffb);
                 if (diffb != 0) {
                     /*diff = (mat_M[j][i]-mat_M[i][j])/diff;
                     printf("arctan input=%d, output=", diff);
@@ -136,8 +136,8 @@ int main(void)
                 ltheta = (theta_s - theta_d + 1) >> 1;   // TODO: saturating addition?
                 rtheta = (theta_s + theta_d + 1) >> 1;
                 
-                dltheta = (theta_sum - theta_diff) / 2;
-                drtheta = (theta_sum + theta_diff) / 2;
+                //dltheta = (theta_sum - theta_diff) / 2;
+                //drtheta = (theta_sum + theta_diff) / 2;
                 
                 //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
                 //printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
