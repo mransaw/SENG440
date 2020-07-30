@@ -23,8 +23,8 @@ void printoutSVD(SVD svd);
 
 #define ITER 14
 #define KN 79595
-#define NUM_SWEEPS 4
-#define M 4
+#define NUM_SWEEPS 10
+#define M 6
 
 extern const int angles[14];
 
