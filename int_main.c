@@ -71,7 +71,8 @@ int main(void)
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
-                int theta_s, theta_d, ltheta, rtheta, v_temp;
+                int theta_s, theta_d, ltheta, rtheta;
+                int32_t v_temp;
                 int16_t sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
