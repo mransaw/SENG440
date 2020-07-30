@@ -21,18 +21,27 @@ int main(void)
     //bool done = false;
     
     // initialize matrices
-    int16_t mat_M[M][M] = {
+    /*int16_t mat_M[M][M] = {
         {31, 77, -11, 26},
         {-42, 14, 79, -53},
         {-68, -10, 45, 90},
         {34, 16, 38, -19}
     };
-   /* srand(time(0));
+    int16_t mat_M[M][M] = {
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
+        {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)}
+    };*/
+    int16_t mat_M[M][M];
+    srand(time(0));
     for (int i=0; i<M; i++) {
         for (int j=0; j<M; j++) {
             mat_M[i][j] = rand() + 0x8000;
         }
-    }*/
+    }
     
     print_matrixM(mat_M);
     
@@ -63,6 +72,7 @@ int main(void)
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
                 int theta_s, theta_d, ltheta, rtheta;
+                int32_t v_temp;
                 int16_t sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
@@ -76,8 +86,26 @@ int main(void)
                 // start timer for rotation angle calculations
                 clk = clock();
                 
-                sum = mat_M[j][i] + mat_M[i][j];
-                sumb = mat_M[j][j] - mat_M[i][i];
+                //sum = mat_M[j][i] + mat_M[i][j];
+                //diffb = mat_M[j][j] + mat_M[i][i];
+                __asm__ __volatile__ (
+                    " qadd16 %0 , %1 , %2\n\t"
+                    : "=r" ( v_temp )
+                    : "r" (mat_M[j][i] + (mat_M[j][j]<<16)), "r" (mat_M[i][j] + (mat_M[i][i]<<16))
+                );
+                sum = (int16_t)(v_temp & 0x8000FFFF);    // 1 for MSB of mask to preserve sign bit?
+                diffb = (int16_t)(v_temp >> 16);
+                
+                //sumb = mat_M[j][j] - mat_M[i][i];
+                //diff = mat_M[j][i] - mat_M[i][j];
+                __asm__ __volatile__ (
+                    " qsub16 %0 , %1 , %2\n\t"
+                    : "=r" ( v_temp )
+                    : "r" (mat_M[j][j] + (mat_M[j][i]<<16)), "r" (mat_M[i][i] + (mat_M[i][j]<<16))
+                );
+                sumb = (int16_t)(v_temp & 0x8000FFFF);    // 1 for MSB of mask to preserve sign bit?
+                diff = (int16_t)(v_temp >> 16);
+                
                 //printf("sum=%d, sumb=%d\n", sum, sumb);
                 //theta_sum = atan((double)sum/sumb);
                 if (sumb != 0) {
@@ -101,8 +129,8 @@ int main(void)
                 
                 // TODO: saturating addition?
               
-                diff = mat_M[j][i] - mat_M[i][j];
-                diffb = mat_M[j][j] + mat_M[i][i];
+                //diff = mat_M[j][i] - mat_M[i][j];
+                //diffb = mat_M[j][j] + mat_M[i][i];
                 
                 //theta_diff = atan((double)diff/diffb);
                 if (diffb != 0) {
@@ -127,13 +155,12 @@ int main(void)
                         theta_d = -(1 << (SF_ATAN_OUT-1));   
                     } else {
                         printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        printf("%d sweeps\n", sweeps);
                         print_matrixM(mat_M);
                         return EXIT_FAILURE;
                     }
                 }
                 
-                ltheta = (theta_s - theta_d + 1) >> 1;   // TODO: saturating addition?
+                ltheta = (theta_s - theta_d + 1) >> 1;  
                 rtheta = (theta_s + theta_d + 1) >> 1;
                 
                 //dltheta = (theta_sum - theta_diff) / 2;
