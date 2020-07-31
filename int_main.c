@@ -39,7 +39,7 @@ int main(void)
     srand(time(0));
     for (int i=0; i<M; i++) {
         for (int j=0; j<M; j++) {
-            mat_M[i][j] = rand() + 0x8000;
+            mat_M[i][j] = (int16_t)(rand() % 0xFFFF);
         }
     }
     
@@ -71,9 +71,9 @@ int main(void)
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
-                int theta_s, theta_d, ltheta, rtheta;
+                int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb;
                 int32_t v_temp;
-                int16_t sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
+                int16_t lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
                 //double theta_sum, theta_diff, dltheta, drtheta;
@@ -93,7 +93,7 @@ int main(void)
                     : "=r" ( v_temp )
                     : "r" (mat_M[j][i] + (mat_M[j][j]<<16)), "r" (mat_M[i][j] + (mat_M[i][i]<<16))
                 );
-                sum = (int16_t)(v_temp & 0x8000FFFF);    // 1 for MSB of mask to preserve sign bit?
+                sum = (int16_t)(v_temp & 0x0000FFFF);
                 diffb = (int16_t)(v_temp >> 16);
                 
                 //sumb = mat_M[j][j] - mat_M[i][i];
@@ -103,7 +103,7 @@ int main(void)
                     : "=r" ( v_temp )
                     : "r" (mat_M[j][j] + (mat_M[j][i]<<16)), "r" (mat_M[i][i] + (mat_M[i][j]<<16))
                 );
-                sumb = (int16_t)(v_temp & 0x8000FFFF);    // 1 for MSB of mask to preserve sign bit?
+                sumb = (int16_t)(v_temp & 0x000FFFF); 
                 diff = (int16_t)(v_temp >> 16);
                 
                 //printf("sum=%d, sumb=%d\n", sum, sumb);
@@ -225,8 +225,7 @@ int main(void)
                 transposeM(r_Vt, r_V);
                 dot_productM(r_V, Vt, Vt);
                 
-                clk = clock() - clk;
-                clk_rota += clk;
+                clk_rota += clock() - clk;
                 //printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
                 
                 //transposeM(Vt, r_V);
@@ -236,7 +235,7 @@ int main(void)
                 //return -1;
             }
         }
-        print_matrixM(mat_M);
+        //print_matrixM(mat_M);
         // check if M is close enough
         /*done = true;
         for (int i=0; i<M; i++) {
@@ -253,7 +252,7 @@ int main(void)
         sweeps++;*/
     }
     clk_total = clock() - clk_total;
-    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*6*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*6*NUM_SWEEPS));
+    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*16*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*16*NUM_SWEEPS));
     print_matrixM(mat_M);
     
     return EXIT_SUCCESS;

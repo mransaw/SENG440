@@ -21,16 +21,17 @@ void printoutSVD(SVD svd);
 #include <stdint.h>
 #include <string.h>
 
-#define ITER 14
+#define ITER 12
 #define KN 79595
 #define NUM_SWEEPS 10
+#define N_TIMES 10
 #define M 6
 
 extern const int angles[14];
 
-void cordic(int16_t* cos, int16_t* sin, int angle);
-void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[M][M]);
-void transposeM(int16_t source[restrict M][M], int16_t dest[M][M]);
-void print_matrix2(int16_t matrix[2][2]);
-void print_matrixM(int16_t matrix[M][M]);
-void print_descaled(int16_t matrix[M][M]);
+void cordic(int* cos, int* sin, int angle);
+void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M]);
+void transposeM(int source[M][M], int dest[M][M]);
+void print_matrix2(int matrix[2][2]);
+void print_matrixM(int matrix[M][M]);
+void print_descaled(int matrix[M][M]);
