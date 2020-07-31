@@ -11,28 +11,29 @@ const int angles[14] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41, 20, 10, 5
 void cordic(int* cos, int* sin, int theta)
 {
     // initialize sin/cos vector
-    int v[2] = {(1<<SF_ATAN_IN), 0};
-    int angle;
+    register int v0 = (1<<SF_ATAN_IN),
+                 v1 = 0;
+    register int angle;
     
     for (int j=0; j<ITER; j++) {
         //int factor;
         // initialize temporary variables
-        int temp0 = v[0],
-                temp1 = v[1];
+        register int temp0 = v0,
+                     temp1 = v1;
                 
         // perform rotation
         angle = angles[j];
         if (theta < 0) {
             //factor = -(1 >> shiftf);
             
-            v[0] += (temp1 >> j);
-            v[1] -= (temp0 >> j);
+            v0 += (temp1 >> j);
+            v1 -= (temp0 >> j);
             theta += angle;
         } else {
             //factor = (1 >> shiftf);
             
-            v[0] -= (temp1 >> j);
-            v[1] += (temp0 >> j);
+            v0 -= (temp1 >> j);
+            v1 += (temp0 >> j);
             theta -= angle;
         }
         
@@ -57,17 +58,17 @@ void cordic(int* cos, int* sin, int theta)
     //printf("A: %f, Kn: %f\n", A, Kn);`
     
     // apply output factor Kn
-    int temp_cos = v[0] * KN;
-    int temp_sin = v[1] * KN;
+    v0 *= KN;
+    v1 *= KN;
     
     //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
     // remove added SF (from Kn) and return results
-    *cos = (temp_cos + (1<<16)) >> 17;
-    *sin = (temp_sin + (1<<16)) >> 17;
+    *cos = (v0 + (1<<16)) >> 17;
+    *sin = (v1 + (1<<16)) >> 17;
     return;
 }
 
-void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
+void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
 {
     int16_t temp[M][M];
     
@@ -76,7 +77,7 @@ void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
-            int sum = 0;
+            register int sum = 0;
             for (int n=0; n<M; n++) {
                 sum += m1[k][n]*m2[n][l]; // TODO: saturating addition?
               // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
@@ -93,7 +94,7 @@ void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
     return;
 }
 
-void transposeM(int16_t source[M][M], int16_t dest[M][M])
+void transposeM(int16_t source[restrict M][M], int16_t dest[restrict M][M])
 {
     int16_t result[M][M];
     
