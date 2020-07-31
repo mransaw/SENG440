@@ -71,9 +71,8 @@ int main(void)
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
-                int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb;
+                int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int32_t v_temp;
-                int16_t lcos, lsin, rcos, rsin;
                 int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
                 
                 //double theta_sum, theta_diff, dltheta, drtheta;
@@ -94,7 +93,7 @@ int main(void)
                     : "r" (mat_M[j][i] + (mat_M[j][j]<<16)), "r" (mat_M[i][j] + (mat_M[i][i]<<16))
                 );
                 sum = (int16_t)(v_temp & 0x0000FFFF);
-                diffb = (int16_t)(v_temp >> 16);
+                diffb = (v_temp >> 16);
                 
                 //sumb = mat_M[j][j] - mat_M[i][i];
                 //diff = mat_M[j][i] - mat_M[i][j];
@@ -104,7 +103,7 @@ int main(void)
                     : "r" (mat_M[j][j] + (mat_M[j][i]<<16)), "r" (mat_M[i][i] + (mat_M[i][j]<<16))
                 );
                 sumb = (int16_t)(v_temp & 0x000FFFF); 
-                diff = (int16_t)(v_temp >> 16);
+                diff = (v_temp >> 16);
                 
                 //printf("sum=%d, sumb=%d\n", sum, sumb);
                 //theta_sum = atan((double)sum/sumb);

@@ -62,14 +62,14 @@ void cordic(int* cos, int* sin, int theta)
     
     //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
     // remove added SF (from Kn) and return results
-    *cos = (int)((temp_cos + (1<<16))>>17);
-    *sin = (int)((temp_sin + (1<<16))>>17);
+    *cos = (temp_cos + (1<<16)) >> 17;
+    *sin = (temp_sin + (1<<16)) >> 17;
     return;
 }
 
-void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M])
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
 {
-    int temp[M][M];
+    int16_t temp[M][M];
     
     //print_descaled(m1);
     //print_descaled(m2);
@@ -83,30 +83,30 @@ void dot_productM(int m1[M][M], int m2[M][M], int dest[M][M])
                // printf("sum=%d\n\n, ", sum);
             }
             //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
-            temp[k][l] = (int)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
     //print_descaled(temp);
     
-    memcpy(dest, temp, M*M*sizeof(int)); 
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
     return;
 }
 
-void transposeM(int source[M][M], int dest[M][M])
+void transposeM(int16_t source[M][M], int16_t dest[M][M])
 {
-    int result[M][M];
+    int16_t result[M][M];
     
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
             result[k][l] = source[l][k];
         }
     }
-    memcpy(dest, result, M*M*sizeof(int));
+    memcpy(dest, result, M*M*sizeof(int16_t));
     return;
 }
 
-void print_matrix2(int matrix[2][2])
+void print_matrix2(int16_t matrix[2][2])
 {
     for (int k=0; k<2; k++) {
         for (int l=0; l<2; l++) {
@@ -118,7 +118,7 @@ void print_matrix2(int matrix[2][2])
     return;
 }
 
-void print_matrixM(int matrix[M][M])
+void print_matrixM(int16_t matrix[M][M])
 {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
@@ -130,7 +130,7 @@ void print_matrixM(int matrix[M][M])
     return;
 }
 
-void print_descaled(int matrix[M][M])
+void print_descaled(int16_t matrix[M][M])
 {
     for (int k=0; k<M; k++) {
         for (int l=0; l<M; l++) {
