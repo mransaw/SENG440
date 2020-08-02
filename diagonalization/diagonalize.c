@@ -94,6 +94,58 @@ void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t 
     return;
 }
 
+void T1dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
+{
+    int16_t temp[M][M];
+    
+    //print_descaled(m1);
+    //print_descaled(m2);
+    
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            register int sum = 0;
+            for (int n=0; n<M; n++) {
+                sum += m1[n][k]*m2[n][l]; // TODO: saturating addition?
+              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
+               // printf("sum=%d\n\n, ", sum);
+            }
+            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
+            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+        }
+    }        
+    
+    //print_descaled(temp);
+    
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    return;
+}
+
+void T2dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
+{
+    int16_t temp[M][M];
+    
+    //print_descaled(m1);
+    //print_descaled(m2);
+    
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            register int sum = 0;
+            for (int n=0; n<M; n++) {
+                sum += m1[k][n]*m2[l][n]; // TODO: saturating addition?
+              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
+               // printf("sum=%d\n\n, ", sum);
+            }
+            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
+            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+        }
+    }        
+    
+    //print_descaled(temp);
+    
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    return;
+}
+
 void transposeM(int16_t source[restrict M][M], int16_t dest[restrict M][M])
 {
     int16_t result[M][M];

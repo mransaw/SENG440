@@ -73,7 +73,7 @@ int main(void)
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
                 int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int32_t v_temp;
-                int16_t r_U[M][M], r_V[M][M], r_Ut[M][M], r_Vt[M][M];     
+                int16_t r_U[M][M], r_Vt[M][M];     
                 
                 //double theta_sum, theta_diff, dltheta, drtheta;
                       
@@ -216,13 +216,15 @@ int main(void)
                 dot_productM(mat_M, r_Vt, mat_M);
                 
                 // update U and V
-                transposeM(r_U, r_Ut);
-                dot_productM(U, r_Ut, U);
+                //transposeM(r_U, r_Ut);
+                //dot_productM(U, r_Ut, U);
+                T2dot_productM(U, r_U, U);
 
                 //print_descaled(U);
                 
-                transposeM(r_Vt, r_V);
-                dot_productM(r_V, Vt, Vt);
+                //transposeM(r_Vt, r_V);
+                //dot_productM(r_V, Vt, Vt);
+                T1dot_productM(r_Vt, Vt, Vt);
                 
                 clk_rota += clock() - clk;
                 //printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));

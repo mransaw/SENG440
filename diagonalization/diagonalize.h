@@ -31,6 +31,8 @@ extern const int angles[14];
 
 void cordic(int* cos, int* sin, int angle);
 void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M]);
+void T1dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M]);
+void T2dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M]);
 void transposeM(int16_t source[restrict M][M], int16_t dest[restrict M][M]);
 void print_matrix2(int16_t matrix[2][2]);
 void print_matrixM(int16_t matrix[M][M]);
