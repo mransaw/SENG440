@@ -73,7 +73,7 @@ int main(void)
                 //int sum, sumb, diff, diffb, ltheta, rtheta;
                 int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int32_t v_temp;
-                int16_t r_U[M][M], r_Vt[M][M];     
+                int16_t r_U[M][M], r_Vt[M][M], r_Ut[M][M], r_V[M][M];     
                 
                 //double theta_sum, theta_diff, dltheta, drtheta;
                       
