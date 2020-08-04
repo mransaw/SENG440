@@ -8,17 +8,12 @@
 #include <stdint.h>
 #include <time.h>
 
-// TODO: #define IDENTITY_MATRIX_M
-
 int main(void)
 {
     // clock variables for benchmarking
     clock_t clk, clk_total,
             clk_rota=0,
             clk_angles=0;
-    
-    // initialize done flag
-    //bool done = false;
     
     // initialize matrices
     /*int16_t mat_M[M][M] = {
@@ -35,6 +30,7 @@ int main(void)
         {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)},
         {(1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN), (1<<SF_ATAN_IN)}
     };*/
+    
     int16_t mat_M[M][M];
     srand(time(0));
     for (int i=0; i<M; i++) {
@@ -65,22 +61,15 @@ int main(void)
     // start timer for SVD algorithm
     clk_total = clock();
     
-    //while (!done) {
     for (int n=0; n<NUM_SWEEPS; n++) {
         // select submatrix indices
         for (int i=0; i<(M-1); i++) {
             for (int j=i+1; j<M; j++) {
-                //int sum, sumb, diff, diffb, ltheta, rtheta;
                 int theta_s, theta_d, ltheta, rtheta, sum, sumb, diff, diffb, lcos, lsin, rcos, rsin;
                 int32_t v_temp;
                 int16_t r_U[M][M], r_Vt[M][M], r_Ut[M][M], r_V[M][M];     
                 
-                //double theta_sum, theta_diff, dltheta, drtheta;
-                      
-                //printf("i: %d, j: %d\n", i, j);
-                
                 // calculate rotation angles
-                // TODO: saturating addition?
                 
                 // start timer for rotation angle calculations
                 clk = clock();
@@ -105,94 +94,17 @@ int main(void)
                 sumb = (int16_t)(v_temp & 0x000FFFF); 
                 diff = (v_temp >> 16);
                 
-                //printf("sum=%d, sumb=%d\n", sum, sumb);
-                //theta_sum = atan((double)sum/sumb);
-                if (sumb != 0) {
-                    //sum = lin_arctan(sum);
-                    theta_s = arctan2(sum, sumb);
-                    //printf("arctan output=%f, scaled: %d\n", theta_sum, theta_s);
-                } else {
-                    if (sum > 0) {
-                        // sum equals pi/2, scaled
-                        theta_s = 1 << (SF_ATAN_OUT-1); 
-                    } else if (sum < 0) {
-                        // sum equals -pi/2, scaled
-                        theta_s = -(1 << (SF_ATAN_OUT-1));    
-                    } else {
-                        printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        printf("%d sweeps\n", sweeps);
-                        print_matrixM(mat_M);
-                        return EXIT_FAILURE;
-                    }
-                }
-                
-                // TODO: saturating addition?
-              
-                //diff = mat_M[j][i] - mat_M[i][j];
-                //diffb = mat_M[j][j] + mat_M[i][i];
-                
-                //theta_diff = atan((double)diff/diffb);
-                if (diffb != 0) {
-                    /*diff = (mat_M[j][i]-mat_M[i][j])/diff;
-                    printf("arctan input=%d, output=", diff);
-                    diff = lin_arctan(diff);
-                    printf("%d\n\n", diff);*/
-                    
-                   
-                    //theta_diff = atan2((double)diff,(double)diffb);
-                    //printf("arctan output=");
-                    //sum = lin_arctan(sum);
-                    theta_d = arctan2(diff, diffb);
-                    //theta_d = arctan2(diff, diffb);
-                    //printf("%f, scaled: %d\n", theta_diff, diff);
-                } else {
-                    if (diff > 0) {
-                        // diff equals pi/2, scaled
-                        theta_d = 1 << (SF_ATAN_OUT-1);   
-                    } else if (diff < 0) {
-                        // diff equals -pi/2, scaled
-                        theta_d = -(1 << (SF_ATAN_OUT-1));   
-                    } else {
-                        printf("\nDANGER: input to arctan() is 0/0\n\n");
-                        print_matrixM(mat_M);
-                        return EXIT_FAILURE;
-                    }
-                }
+                theta_s = arctan2(sum, sumb);
+                theta_d = arctan2(diff, diffb);
                 
                 ltheta = (theta_s - theta_d + 1) >> 1;  
                 rtheta = (theta_s + theta_d + 1) >> 1;
-                
-                //dltheta = (theta_sum - theta_diff) / 2;
-                //drtheta = (theta_sum + theta_diff) / 2;
-                
-                //printf("sum: %d, diff: %d, ltheta: %d, rtheta: %d\n", sum, diff, ltheta, rtheta);
-                //printf("sum: %d, diff: %d, ltheta: %f, rtheta: %f\n", sum, diff, dltheta, drtheta);
-                
-                // calculate rotation matrix elements
-               /* lcos = lin_cos(ltheta);
-                lsin = lin_sin(ltheta);
-                rcos = lin_cos(rtheta);
-                rsin = lin_sin(rtheta);*/
-                
 
-                //cordic(&lcos, &lsin, (int)(dltheta*pow(2,SF_ATAN_OUT)/M_PI));
-                cordic(&lcos, &lsin, ltheta);
-                
-                //cordic(&rcos, &rsin, (int)(drtheta*pow(2,SF_ATAN_OUT)/M_PI));
+                cordic(&lcos, &lsin, ltheta);                
                 cordic(&rcos, &rsin, rtheta);
                 
-                clk = clock() - clk;
-                clk_angles += clk;
-                //printf("calculating rotation angles took %.0f [us]\n", 1000000*(double)clk/(CLOCKS_PER_SEC));
-
-                //printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));
-                
-                /*lcos = (int16_t)(cos(dltheta)*pow(2,SF_ATAN_IN));
-                lsin = (int16_t)(sin(dltheta)*pow(2,SF_ATAN_IN));
-                rcos = (int16_t)(cos(drtheta)*pow(2,SF_ATAN_IN));
-                rsin = (int16_t)(sin(drtheta)*pow(2,SF_ATAN_IN));
-                
-                printf("lcos: %f, lsin: %f, rcos: %f, rsin: %f\n\n",(double)lcos/pow(2,SF_ATAN_IN),(double)lsin/pow(2,SF_ATAN_IN),(double)rcos/pow(2,SF_ATAN_IN),(double)rsin/pow(2,SF_ATAN_IN));*/
+                // stop angles timer
+                clk_angles += clock() - clk;
                 
                 // build rotation matrices
                 memcpy(r_U, I, M*M*sizeof(int16_t));
@@ -212,42 +124,26 @@ int main(void)
                 clk = clock();
                 
                 // apply rotations to M and update U and V
+                //T2dot_productM(U, r_U, U);
                 transposeM(r_U, r_Ut);
                 dot_productM(r_U, mat_M, mat_M);
                 dot_productM(U, r_Ut, U);
-                //T2dot_productM(U, r_U, U);
                 
                 transposeM(r_Vt, r_V);
                 dot_productM(mat_M, r_Vt, mat_M);
                 dot_productM(r_V, Vt, Vt);
                 //T1dot_productM(r_Vt, Vt, Vt);
                 
+                // stop rotations timer
                 clk_rota += clock() - clk;
-                //printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
-                
-                //transposeM(Vt, r_V);
-                //print_descaled(r_V);
                 
                 //print_matrixM(mat_M);
-                //return -1;
             }
         }
         //print_matrixM(mat_M);
-        // check if M is close enough
-        /*done = true;
-        for (int i=0; i<M; i++) {
-            for (int j=0; j<M; j++) {
-                if (i != j) {
-                    // TODO: determine what the maximum residual should be
-                    if (abs(mat_M[i][j]) > 1000) {
-                        done = false;
-                    }
-                }
-            }
-        }
-        //return -1; //TODO: remove after testing
-        sweeps++;*/
     }
+    
+    
     clk_total = clock() - clk_total;
     printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*16*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*16*NUM_SWEEPS));
     print_matrixM(mat_M);
