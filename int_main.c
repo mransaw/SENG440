@@ -211,20 +211,16 @@ int main(void)
                 // start timer for matrix rotations and updating MUV
                 clk = clock();
                 
-                // apply rotations to M
+                // apply rotations to M and update U and V
+                transposeM(r_U, r_Ut);
                 dot_productM(r_U, mat_M, mat_M);
+                dot_productM(U, r_Ut, U);
+                //T2dot_productM(U, r_U, U);
+                
+                transposeM(r_Vt, r_V);
                 dot_productM(mat_M, r_Vt, mat_M);
-                
-                // update U and V
-                //transposeM(r_U, r_Ut);
-                //dot_productM(U, r_Ut, U);
-                T2dot_productM(U, r_U, U);
-
-                //print_descaled(U);
-                
-                //transposeM(r_Vt, r_V);
-                //dot_productM(r_V, Vt, Vt);
-                T1dot_productM(r_Vt, Vt, Vt);
+                dot_productM(r_V, Vt, Vt);
+                //T1dot_productM(r_Vt, Vt, Vt);
                 
                 clk_rota += clock() - clk;
                 //printf("rotating M and updating MUV took %.0f [us]\n\n", (double)1000000*(double)clk/(CLOCKS_PER_SEC));
