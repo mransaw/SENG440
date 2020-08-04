@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 // angles are calculated for SF_ATAN_OUT = (2^15)/pi
 const int angles[14] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41, 20, 10, 5, 3, 1};
@@ -71,20 +72,26 @@ void cordic(int* cos, int* sin, int theta)
 void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
 {
     int16_t temp[M][M];
+    //memset(temp, 0, M*M*sizeof(int16_t));
     
-    //print_descaled(m1);
+    //print_matrixM(temp);
     //print_descaled(m2);
-    
-    for (int k=0; k<M; k++) {
-        for (int l=0; l<M; l++) {
-            register int sum = 0;
-            for (int n=0; n<M; n++) {
-                sum += m1[k][n]*m2[n][l]; // TODO: saturating addition?
-              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
-               // printf("sum=%d\n\n, ", sum);
+    for (int l=0; l<M; l++) {
+
+        for (int k=0; k<M; k+=3) { 
+             register int sum0 = 0,
+                          sum1 = 0,
+                          sum2 = 0;
+                     
+            for (int n=0; n<M; n+=3) {
+                sum0 += m1[k][n]*m2[n][l] + m1[k][n+1]*m2[n+1][l] + m1[k][n+2]*m2[n+2][l];
+                sum1 += m1[k+1][n]*m2[n][l] + m1[k+1][n+1]*m2[n+1][l] + m1[k+1][n+2]*m2[n+2][l];
+                sum2 += m1[k+2][n]*m2[n][l] + m1[k+2][n+1]*m2[n+1][l] + m1[k+2][n+2]*m2[n+2][l];
             }
-            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
-            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l] = (int16_t)((sum1 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l] = (int16_t)((sum2 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
