@@ -29,7 +29,7 @@ void printoutSVD(SVD svd);
 
 extern const int angles[10];
 
-void cordic(int* cos, int* sin, int angle);
+void cordic(int* restrict cos, int* restrict sin, int angle);
 void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
 void T1dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
 void T2dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M]);
