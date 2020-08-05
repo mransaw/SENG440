@@ -8,7 +8,7 @@
 // angles are calculated for SF_ATAN_OUT = (2^15)/pi
 const int angles[10] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41};
 
-void cordic(int* cos, int* sin, int theta)
+void cordic(int* restrict cos, int* restrict sin, int theta)
 {
     // initialize sin/cos vector
     register int v0 = (1<<SF_ATAN_IN),
@@ -50,9 +50,9 @@ void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
     for (int l=0; l<M; l++) {
 
         for (int k=0; k<M; k+=3) { 
-             register int sum0 = 0,
-                          sum1 = 0,
-                          sum2 = 0;
+            register int sum0 = 0,
+                         sum1 = 0,
+                         sum2 = 0;
                      
             for (int n=0; n<M; n+=3) {
                 sum0 += m1[k][n]*m2[n][l] + m1[k][n+1]*m2[n+1][l] + m1[k][n+2]*m2[n+2][l];
@@ -82,7 +82,7 @@ void T1dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
     for (int l=0; l<M; l++) {
 
         for (int k=0; k<M; k++) { 
-             register int sum0 = 0;
+            register int sum0 = 0;
                      
             for (int n=0; n<M; n+=3) {
                 sum0 += m1[n][k]*m2[n][l] + m1[n+1][k]*m2[n+1][l] + m1[n+2][k]*m2[n+2][l];
@@ -108,7 +108,7 @@ void T2dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
     for (int l=0; l<M; l+=3) {
 
         for (int k=0; k<M; k+=3) { 
-             register int sum0 = 0,
+            register int sum0 = 0,
                           sum1 = 0,
                           sum2 = 0,
                           sum3 = 0,
