@@ -6,8 +6,7 @@
 #include <string.h>
 
 // angles are calculated for SF_ATAN_OUT = (2^15)/pi
-const int angles[14] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41, 20, 10, 5, 3, 1};
-//const int16_t angles[6] = {6434, 3798, 2007, 1019, 511, 256};//, 128, 64}; for 2^13
+const int angles[10] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41};
 
 void cordic(int* cos, int* sin, int theta)
 {
@@ -17,7 +16,6 @@ void cordic(int* cos, int* sin, int theta)
     register int angle;
     
     for (int j=0; j<ITER; j++) {
-        //int factor;
         // initialize temporary variables
         register int temp0 = v0,
                      temp1 = v1;
@@ -25,57 +23,30 @@ void cordic(int* cos, int* sin, int theta)
         // perform rotation
         angle = angles[j];
         if (theta < 0) {
-            //factor = -(1 >> shiftf);
-            
             v0 += (temp1 >> j);
             v1 -= (temp0 >> j);
             theta += angle;
         } else {
-            //factor = (1 >> shiftf);
-            
             v0 -= (temp1 >> j);
             v1 += (temp0 >> j);
             theta -= angle;
         }
-        
-        //shiftf++;
-        //v[0] = v[0] - factor*v[1];
-        //v[1] = factor*temp + v[1];
-        
-        /*if ((j+1) > ANGLES_LENGTH) {
-            angle = (angle+1) >> 1;
-        } else {
-            angle = angles(j+1);
-        }*/
     }
-    
-    /*double A = 1;
-    for (int i=0; i<ITER; i++) {
-        A *= sqrt(1 + pow(2,-2*i));
-    }
-    
-    double Kn = 1/A;*/
-    
-    //printf("A: %f, Kn: %f\n", A, Kn);`
     
     // apply output factor Kn
     v0 *= KN;
     v1 *= KN;
     
-    //printf("input: %d, cos: %d, sin: %d\n", theta, v[0], v[1]); 
     // remove added SF (from Kn) and return results
     *cos = (v0 + (1<<16)) >> 17;
     *sin = (v1 + (1<<16)) >> 17;
     return;
 }
 
-void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
 {
     int16_t temp[M][M];
-    //memset(temp, 0, M*M*sizeof(int16_t));
-    
-    //print_matrixM(temp);
-    //print_descaled(m2);
+
     for (int l=0; l<M; l++) {
 
         for (int k=0; k<M; k+=3) { 
@@ -101,23 +72,23 @@ void dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t 
     return;
 }
 
-void T1dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
+void T1dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
 {
     int16_t temp[M][M];
+    //memset(temp, 0, M*M*sizeof(int16_t));
     
-    //print_descaled(m1);
+    //print_matrixM(temp);
     //print_descaled(m2);
-    
-    for (int k=0; k<M; k++) {
-        for (int l=0; l<M; l++) {
-            register int sum = 0;
-            for (int n=0; n<M; n++) {
-                sum += m1[n][k]*m2[n][l]; // TODO: saturating addition?
-              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
-               // printf("sum=%d\n\n, ", sum);
+    for (int l=0; l<M; l++) {
+
+        for (int k=0; k<M; k++) { 
+             register int sum0 = 0;
+                     
+            for (int n=0; n<M; n+=3) {
+                sum0 += m1[n][k]*m2[n][l] + m1[n+1][k]*m2[n+1][l] + m1[n+2][k]*m2[n+2][l];
             }
-            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
-            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
@@ -127,23 +98,47 @@ void T1dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_
     return;
 }
 
-void T2dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_t dest[restrict M][M])
+void T2dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
 {
-    int16_t temp[M][M];
+     int16_t temp[M][M];
+    //memset(temp, 0, M*M*sizeof(int16_t));
     
-    //print_descaled(m1);
+    //print_matrixM(temp);
     //print_descaled(m2);
-    
-    for (int k=0; k<M; k++) {
-        for (int l=0; l<M; l++) {
-            register int sum = 0;
+    for (int l=0; l<M; l+=3) {
+
+        for (int k=0; k<M; k+=3) { 
+             register int sum0 = 0,
+                          sum1 = 0,
+                          sum2 = 0,
+                          sum3 = 0,
+                          sum4 = 0,
+                          sum5 = 0,
+                          sum6 = 0,
+                          sum7 = 0,
+                          sum8 = 0;
+                     
             for (int n=0; n<M; n++) {
-                sum += m1[k][n]*m2[l][n]; // TODO: saturating addition?
-              // printf("1[%d][%d] * 2[%d][%d]\n",k,n,n,l);
-               // printf("sum=%d\n\n, ", sum);
+                sum0 += m1[k][n]*m2[l][n];
+                sum1 += m1[k+1][n]*m2[l][n];
+                sum2 += m1[k+2][n]*m2[l][n];
+                sum3 += m1[k][n]*m2[l+1][n];
+                sum4 += m1[k+1][n]*m2[l+1][n];
+                sum5 += m1[k+2][n]*m2[l+1][n];
+                sum6 += m1[k][n]*m2[l+2][n];
+                sum7 += m1[k+1][n]*m2[l+2][n];
+                sum8 += m1[k+2][n]*m2[l+2][n];
             }
-            //printf("temp: %d, ",((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN));
-            temp[k][l] = (int16_t)((sum + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l] = (int16_t)((sum1 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l] = (int16_t)((sum2 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l+1] = (int16_t)((sum3 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l+1] = (int16_t)((sum4 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l+1] = (int16_t)((sum5 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l+2] = (int16_t)((sum6 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l+2] = (int16_t)((sum7 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l+2] = (int16_t)((sum8 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
     }        
     
@@ -153,7 +148,7 @@ void T2dot_productM(int16_t m1[restrict M][M], int16_t m2[restrict M][M], int16_
     return;
 }
 
-void transposeM(int16_t source[restrict M][M], int16_t dest[restrict M][M])
+void transposeM(int16_t source[M][M], int16_t dest[M][M])
 {
     int16_t result[M][M];
     
