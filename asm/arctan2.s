@@ -129,13 +129,17 @@ f9:
 arctan2:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
+	lsl	r0, r0, #14
+	lsr	r3, r0, #31
+	cmp	r0, #0
+	rsblt	r3, r3, #0
+	rsbge	r3, r3, #1
 	lsl	r1, r1, #14
+	mul	r0, r0, r3
 	lsr	r3, r1, #31
 	cmp	r1, #0
 	rsblt	r3, r3, #0
 	rsbge	r3, r3, #1
-	lsl	r0, r0, #14
-	mul	r0, r0, r3
 	mvn	ip, r0
 	mul	r1, r1, r3
 	lsr	r2, r0, #31
@@ -151,96 +155,96 @@ arctan2:
 	sub	r4, r0, lr
 	asr	r2, r1, #1
 	mla	r2, r4, r2, r3
-	mvn	r5, r2
-	sub	lr, lr, r0
+	mvn	r4, r2
+	sub	r0, lr, r0
 	asr	r3, r3, #1
-	mla	r1, lr, r3, r1
-	lsr	r0, r2, #31
-	lsr	r5, r5, #31
-	sub	r3, r0, r5
-	asr	r4, r1, #2
-	mla	r3, r4, r3, r2
-	mvn	r7, r3
-	sub	r5, r5, r0
-	asr	r2, r2, #2
-	mla	r1, r5, r2, r1
-	lsr	r0, r3, #31
-	lsr	r7, r7, #31
-	sub	r2, r0, r7
-	asr	r4, r1, #3
-	mla	r2, r4, r2, r3
-	mvn	r8, r2
-	sub	r7, r7, r0
-	asr	r3, r3, #3
-	mla	r1, r7, r3, r1
-	lsr	r0, r2, #31
-	lsr	r8, r8, #31
-	sub	r3, r0, r8
-	asr	r4, r1, #4
-	mla	r3, r4, r3, r2
-	mvn	r6, r3
-	sub	r8, r8, r0
-	asr	r2, r2, #4
-	mla	r1, r8, r2, r1
-	lsr	r6, r6, #31
-	lsr	r2, r3, #31
-	sub	r0, r2, r6
-	asr	r9, r1, #5
-	mla	r0, r9, r0, r3
-	mvn	r4, r0
-	sub	r6, r6, r2
-	asr	r3, r3, #5
-	mla	r2, r6, r3, r1
-	lsr	r9, r0, #31
+	mla	r1, r0, r3, r1
 	lsr	r4, r4, #31
-	sub	r3, r9, r4
-	asr	r1, r2, #6
-	mla	r3, r1, r3, r0
-	mvn	r1, r3
-	sub	r4, r4, r9
-	asr	r0, r0, #6
-	mla	r9, r4, r0, r2
-	lsr	r1, r1, #31
-	lsr	r0, r3, #31
-	sub	fp, r0, r1
-	asr	r2, r9, #7
-	mla	fp, r2, fp, r3
-	mvn	r10, fp
-	movw	r2, #:lower16:angles
-	sub	r1, r1, r0
-	asr	r0, r3, #7
-	mla	r0, r1, r0, r9
-	lsr	r10, r10, #31
-	lsr	r9, fp, #31
-	movt	r2, #:upper16:angles
-	sub	r3, r9, r10
-	asr	r0, r0, #8
-	mla	r0, r3, r0, fp
-	ldr	r3, [r2, #4]
-	sub	r9, r10, r9
-	mul	lr, r3, lr
-	ldr	r10, [r2]
-	lsr	r3, r0, #31
-	mla	ip, r10, ip, lr
-	cmp	r0, #0
-	rsblt	r3, r3, #0
-	rsbge	r3, r3, #1
-	ldr	lr, [r2, #8]
-	ldr	r0, [r2, #12]
-	mla	r5, lr, r5, ip
+	lsr	lr, r2, #31
+	sub	r3, lr, r4
+	asr	r5, r1, #2
+	mla	r3, r5, r3, r2
+	mvn	r5, r3
+	sub	lr, r4, lr
+	asr	r2, r2, #2
+	mla	r1, lr, r2, r1
+	lsr	r5, r5, #31
+	lsr	r4, r3, #31
+	sub	r2, r4, r5
+	asr	r6, r1, #3
+	mla	r2, r6, r2, r3
+	mvn	r6, r2
+	sub	r4, r5, r4
+	asr	r3, r3, #3
+	mla	r1, r4, r3, r1
+	lsr	r6, r6, #31
+	lsr	r5, r2, #31
+	sub	r3, r5, r6
+	asr	r7, r1, #4
+	mla	r3, r7, r3, r2
+	mvn	r7, r3
+	sub	r5, r6, r5
+	asr	r2, r2, #4
+	mla	r1, r5, r2, r1
+	lsr	r7, r7, #31
+	lsr	r2, r3, #31
+	sub	r9, r2, r7
+	asr	r6, r1, #5
+	mla	r9, r6, r9, r3
+	mvn	r8, r9
+	sub	r7, r7, r2
+	asr	r3, r3, #5
+	mla	r3, r7, r3, r1
+	lsr	r8, r8, #31
+	lsr	r1, r9, #31
+	sub	r2, r1, r8
+	asr	r6, r3, #6
+	mla	r2, r6, r2, r9
+	mvn	r6, r2
+	sub	r8, r8, r1
+	asr	r1, r9, #6
+	mla	r1, r8, r1, r3
+	lsr	fp, r2, #31
+	lsr	r6, r6, #31
+	sub	r10, fp, r6
+	asr	r3, r1, #7
+	mla	r10, r3, r10, r2
+	movw	r3, #:lower16:angles
+	mvn	r9, r10
+	sub	r6, r6, fp
+	asr	r2, r2, #7
+	mla	r1, r6, r2, r1
+	movt	r3, #:upper16:angles
+	ldr	fp, [r3, #4]
+	lsr	r2, r10, #31
+	lsr	r9, r9, #31
+	mul	fp, fp, r0
+	asr	r1, r1, #8
+	sub	r0, r2, r9
+	mla	r1, r0, r1, r10
+	ldr	r0, [r3]
+	lsr	r10, r1, #31
+	mla	ip, r0, ip, fp
+	cmp	r1, #0
+	rsblt	r1, r10, #0
+	rsbge	r1, r10, #1
+	ldr	fp, [r3, #8]
+	ldr	r0, [r3, #12]
+	mla	lr, fp, lr, ip
+	mla	r4, r0, r4, lr
+	ldr	lr, [r3, #16]
+	ldr	r0, [r3, #20]
+	mla	r5, lr, r5, r4
 	mla	r7, r0, r7, r5
-	ldr	r5, [r2, #16]
-	ldr	r0, [r2, #20]
+	ldr	r5, [r3, #24]
+	ldr	r0, [r3, #28]
 	mla	r8, r5, r8, r7
 	mla	r6, r0, r6, r8
-	ldr	r8, [r2, #24]
-	ldr	r0, [r2, #28]
-	mla	r4, r8, r4, r6
-	mla	r1, r0, r1, r4
-	ldr	r10, [r2, #32]
-	ldr	r0, [r2, #36]
-	mla	r1, r10, r9, r1
-	mla	r0, r0, r3, r1
+	ldr	r0, [r3, #32]
+	sub	r9, r9, r2
+	mla	r9, r0, r9, r6
+	ldr	r0, [r3, #36]
+	mla	r0, r0, r1, r9
 	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
 	.size	arctan2, .-arctan2
 	.ident	"GCC: (GNU) 8.2.1 20180801 (Red Hat 8.2.1-2)"
