@@ -3,7 +3,7 @@
 #include <linear_approx.h>
 #include <stdio.h>
 #include <math.h>
-
+#define sign(V) (V >= 0) - (V < 0)
 int cordic_arctan(int Y, int X) {
     register int z = 0;
     register int X_ = (X << 14);
