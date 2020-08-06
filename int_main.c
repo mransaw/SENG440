@@ -98,17 +98,8 @@ int main(void)
                 sumb = (int16_t)(v_temp & 0x000FFFF); 
                 diff = (v_temp >> 16);
                 
-                printf("----------------\n");
-                printf("sum: %d, sumb: %d\n", sum, sumb);
                 theta_s = arctan2(sum, sumb);
-                arctan2_ver1(sum, sumb);
-
-                printf("\n");
-
-                printf("diff: %d, diffb: %d\n", diff, diffb);
                 theta_d = arctan2(diff, diffb);
-                arctan2_ver1(diff, diffb);
-                printf("----------------\n");
 
                 ltheta = (theta_s - theta_d + 1) >> 1;  
                 rtheta = (theta_s + theta_d + 1) >> 1;
