@@ -81,7 +81,6 @@ int arctan2(int Y, int X) {
 
         z = z + (s * (angles[i]));
         s = sign(Y_);
-        printf("arctan2 modified: %d\n", z);
     }
     return z;
 }
