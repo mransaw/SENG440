@@ -105,7 +105,7 @@ int main(void)
 
                 printf("\n");
 
-                print("diff: %d, diffb: %d\n", diff, diffb);
+                printf("diff: %d, diffb: %d\n", diff, diffb);
                 theta_d = arctan2(diff, diffb);
                 arctan2_ver1(diff, diffb);
                 printf("----------------\n");
