@@ -3,6 +3,7 @@
 #ifndef N_BITS
 #define N_BITS 15
 int arctan2(int Y, int X);
+int arctan2_ver1(int Y, int X);
 int16_t lin_sin(int16_t theta);
 int16_t lin_cos(int16_t theta);
 #endif

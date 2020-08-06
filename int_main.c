@@ -99,7 +99,10 @@ int main(void)
                 diff = (v_temp >> 16);
                 
                 theta_s = arctan2(sum, sumb);
+                arctan2_ver1(sum, sumb);
+
                 theta_d = arctan2(diff, diffb);
+                arctan2_ver1(diff, diffb);
                 
                 ltheta = (theta_s - theta_d + 1) >> 1;  
                 rtheta = (theta_s + theta_d + 1) >> 1;
