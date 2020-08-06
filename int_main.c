@@ -149,7 +149,7 @@ int main(void)
     
     
     clk_total = clock() - clk_total;
-    printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*16*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*16*NUM_SWEEPS));
+    //printf("%d sweeps, took %.0f microseconds total\ncalculating angles took %.0fus (%.0f avg), rotating M and updating MUV took %.0fus (%.0f avg)\n\n", NUM_SWEEPS, 1000000*(double)clk_total/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC), 1000000*(double)clk_angles/(CLOCKS_PER_SEC*16*NUM_SWEEPS), 1000000*(double)clk_rota/(CLOCKS_PER_SEC), 1000000*(double)clk_rota/(CLOCKS_PER_SEC*16*NUM_SWEEPS));
     print_matrixM(mat_M);
     
     return EXIT_SUCCESS;
