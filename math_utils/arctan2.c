@@ -10,9 +10,9 @@ int arctan2(int Y, int X) {
     register int X_ = (X << 14);
 
     register int Y_ = (Y << 14);
-    
-    X_ *= sign(X_);
+
     Y_ *= sign(X_);
+    X_ *= sign(X_);
 
     register int delta_x = 0;
 
