@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 #define sign(V) (V >= 0) - (V < 0)
-int cordic_arctan(int Y, int X) {
+
+int arctan2(int Y, int X) {
     register int z = 0;
     register int X_ = (X << 14);
 
@@ -28,8 +29,4 @@ int cordic_arctan(int Y, int X) {
         s = sign(Y_);
     }
     return z;
-}
-
-int arctan2(int Y, int X) {
-    return cordic_arctan(Y, X);
 }
