@@ -67,7 +67,7 @@ int cordic_arctan(int Y, int X) {
     return z;//phase_shift(Y, X, z);
 }
 
-int arctan2_original(int Y, int X) {
+int arctan2_ver1(int Y, int X) {
     int z = 0;
     /*if (-SCALE_IN < Y && Y < SCALE_IN) {
         return 0;
