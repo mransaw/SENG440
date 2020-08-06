@@ -8,7 +8,6 @@
 #define sign(V) (V >= 0) - (V < 0)
 
 int arctan2(int Y, int X) {
-    clock_t clk = clock();
     register int z = 0;
     register int X_ = (X << 14);
 
@@ -32,7 +31,5 @@ int arctan2(int Y, int X) {
         z = z + (s * (angles[i]));
         s = sign(Y_);
     }
-    clk = clock() - clk;
-    printf("arctan computation time: %lu\n", clk);
     return z;
 }
