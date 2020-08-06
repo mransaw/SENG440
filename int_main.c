@@ -99,7 +99,7 @@ int main(void)
                 diff = (v_temp >> 16);
                 
                 printf("----------------\n");
-                print("sum: %d, sumb: %d\n", sum, sumb);
+                printf("sum: %d, sumb: %d\n", sum, sumb);
                 theta_s = arctan2(sum, sumb);
                 arctan2_ver1(sum, sumb);
 
