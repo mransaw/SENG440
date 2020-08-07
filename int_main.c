@@ -73,13 +73,17 @@ int main(void)
                 
                 // start timer for rotation angle calculations
                 clk = clock();
-                
+                int16_t mat_M_j_i = mat_M[j][i];
+                int16_t mat_M_j_j = mat_M[j][j];
+                int16_t mat_M_i_j = mat_M[i][j];
+                int16_t mat_M_i_i = mat_M[i][i];
+
                 //sum = mat_M[j][i] + mat_M[i][j];
                 //diffb = mat_M[j][j] + mat_M[i][i];
                 __asm__ __volatile__ (
                     " qadd16 %0 , %1 , %2\n\t"
                     : "=r" ( v_temp )
-                    : "r" (mat_M[j][i] + (mat_M[j][j]<<16)), "r" (mat_M[i][j] + (mat_M[i][i]<<16))
+                    : "r" (mat_M_j_i + (mat_M_j_j<<16)), "r" (mat_M_i_j + (mat_M_i_i<<16))
                 );
                 sum = (int16_t)(v_temp & 0x0000FFFF);
                 diffb = (v_temp >> 16);
@@ -89,14 +93,14 @@ int main(void)
                 __asm__ __volatile__ (
                     " qsub16 %0 , %1 , %2\n\t"
                     : "=r" ( v_temp )
-                    : "r" (mat_M[j][j] + (mat_M[j][i]<<16)), "r" (mat_M[i][i] + (mat_M[i][j]<<16))
+                    : "r" (mat_M_j_j + (mat_M_j_i<<16)), "r" (mat_M_i_i + (mat_M_i_j<<16))
                 );
                 sumb = (int16_t)(v_temp & 0x000FFFF); 
                 diff = (v_temp >> 16);
                 
                 theta_s = arctan2(sum, sumb);
                 theta_d = arctan2(diff, diffb);
-                
+
                 ltheta = (theta_s - theta_d + 1) >> 1;  
                 rtheta = (theta_s + theta_d + 1) >> 1;
 
