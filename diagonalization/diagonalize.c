@@ -3,187 +3,196 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
-void initIdentityMatrix(double** matrix) {
-    for (int i = 0; i < M; ++i) {
-        matrix[i] = (double*)malloc(sizeof(double*) * M);
+// angles are calculated for SF_ATAN_OUT = (2^15)/pi
+const int angles[10] = {8192, 4836, 2555, 1297, 651, 326, 163, 81, 41};
+
+void cordic(int* restrict cos, int* restrict sin, int theta)
+{
+    // initialize sin/cos vector
+    register int v0 = (1<<SF_ATAN_IN),
+                 v1 = 0;
+    register int angle;
+    
+    for (int j=0; j<ITER; j++) {
+        // initialize temporary variables
+        register int temp0 = v0,
+                     temp1 = v1;
+                
+        // perform rotation
+        angle = angles[j];
+        if (theta < 0) {
+            v0 += (temp1 >> j);
+            v1 -= (temp0 >> j);
+            theta += angle;
+        } else {
+            v0 -= (temp1 >> j);
+            v1 += (temp0 >> j);
+            theta -= angle;
+        }
     }
-    int value;
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < M; ++j) {
-            if (i == j) {
-                value = 1;
-            } else {
-                value = 0;
+    
+    // apply output factor Kn
+    v0 *= KN;
+    v1 *= KN;
+    
+    // remove added SF (from Kn) and return results
+    *cos = (v0 + (1<<16)) >> 17;
+    *sin = (v1 + (1<<16)) >> 17;
+    return;
+}
+
+void dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
+{
+    int16_t temp[M][M];
+
+    for (int l=0; l<M; l++) {
+
+        for (int k=0; k<M; k+=3) { 
+            register int sum0 = 0,
+                         sum1 = 0,
+                         sum2 = 0;
+                     
+            for (int n=0; n<M; n+=3) {
+                sum0 += m1[k][n]*m2[n][l] + m1[k][n+1]*m2[n+1][l] + m1[k][n+2]*m2[n+2][l];
+                sum1 += m1[k+1][n]*m2[n][l] + m1[k+1][n+1]*m2[n+1][l] + m1[k+1][n+2]*m2[n+2][l];
+                sum2 += m1[k+2][n]*m2[n][l] + m1[k+2][n+1]*m2[n+1][l] + m1[k+2][n+2]*m2[n+2][l];
             }
-            matrix[i][j] = value;
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l] = (int16_t)((sum1 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l] = (int16_t)((sum2 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
         }
-    }
-}
-
-double dotProduct(double* v1, double* v2) {
-    double sum = 0;
-    for (int i = 0; i < M; ++i) {
-        sum += v1[i] * v2[i];
-    }
-    return sum;
-}
-
-void transpose(double** source, double** dest) {
-    for (int row = 0; row < M; ++row) {
-        for (int col = 0; col < M; ++col) {
-            dest[row][col] = source[col][row];
-        }
-    }
-}
-
-void matmul(double** m1, double** m2, double** dest) {
-    double** m2_t = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(m2_t);
-    transpose(m2, m2_t);
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < M; ++j) {
-            dest[i][j] = dotProduct(m1[i], m2_t[j]);
-        }
-    }
-}
-
-void applyRotations(SVD svd, int i, int j, double theta_l, double theta_r) {
-    double cos_l = cos(theta_l); //lin_cos(theta_l);
-    double sin_l = sin(theta_l); //lin_sin(theta_l);
-    double cos_r = cos(theta_r); //lin_cos(theta_r);
-    double sin_r = sin(theta_r); //lin_sin(theta_r);
-
-    printf("\ncos_l: %f       cos_r: %f\n", cos_l, cos_r);
-    printf("sin_l: %f       sin_r: %f\n", sin_l, sin_r);
-
-    double** i_U = (double**)malloc(sizeof(double**) * M);
-    double** i_V = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(i_U);
-    initIdentityMatrix(i_V);
-
-    i_U[i][i] = cos_l;
-    i_U[i][j] = -1 * sin_l;
-    i_U[j][i] = sin_l;
-    i_U[j][j] = cos_l;
-
-    i_V[i][i] = cos_r;
-    i_V[i][j] = -1 * sin_r;
-    i_V[j][i] = sin_r;
-    i_V[j][j] = cos_r;
-
-    double** i_U_t = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(i_U_t);
-    transpose(i_U, i_U_t);
-
-    double** i_V_t = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(i_V_t);
-    transpose(i_V, i_V_t);
-
-    double** V_t = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(V_t);
-    transpose(*svd.V, V_t);
-
-    matmul(*svd.U, i_U_t, *svd.U); // U' = U * i_U_t
-
-    double** M_i_V_t = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(M_i_V_t);
-
-    matmul(*svd.S, i_V_t, M_i_V_t);
-    matmul(i_U, M_i_V_t, *svd.S); // = M' = i_U * M * i_V_t
-
-    double** V__T = (double**)malloc(sizeof(double**) * M);
-    initIdentityMatrix(V__T);
-
-    matmul(i_V, V_t, V__T); // V'_t = i_V * V_t
-    transpose(V__T, *svd.V); // V' = transpose(V'_t)
-    printoutSVD(svd);
-}
-
-void applyJacobiMethod(SVD svd, int i, int j) {
-        int m_ii = (*svd.S)[i][i];
-        int m_ji = (*svd.S)[j][i];
-        int m_ij = (*svd.S)[i][j];
-        int m_jj = (*svd.S)[j][j];
-
-        printf("Jacobi input:\n    %d  %d\n    %d  %d\n", m_ii, m_ij, m_ji, m_jj);
-
-        double X_sum = ((double)(m_ji + m_ij))/((double)(m_jj - m_ii));
-        double X_diff = ((double)(m_ji - m_ij))/((double)(m_jj + m_ii));
-
-        printf("X_sum = %f\n", X_sum);
-        printf("X_diff = %f\n", X_diff);
-
-        int fixed_point = 1 << (N_BITS - 1);
-        X_sum = X_sum * fixed_point;
-
-        double theta_sum = arctan(X_sum);
-        theta_sum = ((double)theta_sum) / ((double)(fixed_point));
-
-        X_diff = X_diff * fixed_point;
-        double theta_diff = arctan(X_diff);
-        theta_diff = ((double)theta_diff) / ((double)(fixed_point));
-
-        printf("atan(X_sum) = %f\n", atan(X_sum));
-        printf("arctan(int_theta_sum) = theta_sum = %f\n", theta_sum);
-        printf("theta_diff = %f\n", theta_diff);
-
-        double theta_r = 0.5*(theta_sum + theta_diff);
-        double theta_l = theta_sum - theta_r;
-
-        printf("theta_l = %f\n", theta_l);
-        printf("theta_r = %f\n", theta_r);
-        applyRotations(svd, i, j, theta_l, theta_r);
-}
-
-void sweep(SVD svd) {
-    int row = 0;
-    int col = row + 1;
-    for (row = 0; row < M; ++row) {
-        printf("SWEEP %d", row + 1);
-        for (col = row + 1; col < M; ++col) {
-            printf(", ITERATION %d\n", col);
-            applyJacobiMethod(svd, row, col);
-        }
-    }
-}
-
-SVD diagonalize(double** matrix) {
-    SVD svd;
+    }        
     
-    double** U = (double**)malloc(sizeof(double**) * M);
-    double** S = matrix;
-    double** V = (double**)malloc(sizeof(double**) * M);
-
-    initIdentityMatrix(U);
-    initIdentityMatrix(V);
-
-    svd.U = &U;
-    svd.S = &S;
-    svd.V = &V;
+    //print_descaled(temp);
     
-    for (int i = 0; i < NUM_SWEEPS; ++i) {
-        sweep(svd);
-    }
-
-    return svd;
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    return;
 }
 
-void printout(const char * matrixName, double** matrix) {
-    printf("----------------------------------\n");
-    printf("%s:\n", matrixName);
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < M; ++j) {
-            printf("%f ", matrix[i][j]);
+void T1dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
+{
+    int16_t temp[M][M];
+    //memset(temp, 0, M*M*sizeof(int16_t));
+    
+    //print_matrixM(temp);
+    //print_descaled(m2);
+    for (int l=0; l<M; l++) {
+
+        for (int k=0; k<M; k++) { 
+            register int sum0 = 0;
+                     
+            for (int n=0; n<M; n+=3) {
+                sum0 += m1[n][k]*m2[n][l] + m1[n+1][k]*m2[n+1][l] + m1[n+2][k]*m2[n+2][l];
+            }
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+        }
+    }        
+    
+    //print_descaled(temp);
+    
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    return;
+}
+
+void T2dot_productM(int16_t m1[M][M], int16_t m2[M][M], int16_t dest[M][M])
+{
+     int16_t temp[M][M];
+    //memset(temp, 0, M*M*sizeof(int16_t));
+    
+    //print_matrixM(temp);
+    //print_descaled(m2);
+    for (int l=0; l<M; l+=3) {
+
+        for (int k=0; k<M; k+=3) { 
+            register int sum0 = 0,
+                          sum1 = 0,
+                          sum2 = 0,
+                          sum3 = 0,
+                          sum4 = 0,
+                          sum5 = 0,
+                          sum6 = 0,
+                          sum7 = 0,
+                          sum8 = 0;
+                     
+            for (int n=0; n<M; n++) {
+                sum0 += m1[k][n]*m2[l][n];
+                sum1 += m1[k+1][n]*m2[l][n];
+                sum2 += m1[k+2][n]*m2[l][n];
+                sum3 += m1[k][n]*m2[l+1][n];
+                sum4 += m1[k+1][n]*m2[l+1][n];
+                sum5 += m1[k+2][n]*m2[l+1][n];
+                sum6 += m1[k][n]*m2[l+2][n];
+                sum7 += m1[k+1][n]*m2[l+2][n];
+                sum8 += m1[k+2][n]*m2[l+2][n];
+            }
+            
+            temp[k][l] = (int16_t)((sum0 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l] = (int16_t)((sum1 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l] = (int16_t)((sum2 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l+1] = (int16_t)((sum3 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l+1] = (int16_t)((sum4 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l+1] = (int16_t)((sum5 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k][l+2] = (int16_t)((sum6 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+1][l+2] = (int16_t)((sum7 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+            temp[k+2][l+2] = (int16_t)((sum8 + (SF_ATAN_IN-1)) >> SF_ATAN_IN);
+        }
+    }        
+    
+    //print_descaled(temp);
+    
+    memcpy(dest, temp, M*M*sizeof(int16_t)); 
+    return;
+}
+
+void transposeM(int16_t source[M][M], int16_t dest[M][M])
+{
+    int16_t result[M][M];
+    
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            result[k][l] = source[l][k];
+        }
+    }
+    memcpy(dest, result, M*M*sizeof(int16_t));
+    return;
+}
+
+void print_matrix2(int16_t matrix[2][2])
+{
+    for (int k=0; k<2; k++) {
+        for (int l=0; l<2; l++) {
+            printf("%d ", matrix[k][l]);
         }
         printf("\n");
     }
+    printf("\n");
+    return;
 }
 
-void printoutSVD(const SVD svd) {
-    printf("=============================\n");
-    printout("U", *svd.U);
-    printout("S", *svd.S);
-    printout("V", *svd.V);
-    printf("=============================\n");
+void print_matrixM(int16_t matrix[M][M])
+{
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            printf("%d ", matrix[k][l]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    return;
+}
+
+void print_descaled(int16_t matrix[M][M])
+{
+    for (int k=0; k<M; k++) {
+        for (int l=0; l<M; l++) {
+            printf("%f ", (double)matrix[k][l]/pow(2,SF_ATAN_IN));
+        }
+        printf("\n");
+    }
+    printf("\n");
+    return;
 }

@@ -2,100 +2,39 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int UPPER_BOUND = 1 << SF_ATAN_IN;
 static double test_vector[NPOINTS];
 static int test_vector_scaled[NPOINTS];
 
 void arctan_tests() {
-    // max input magnitude is 2^31
-    int min_input = -8192,
-        max_input = 8192;
-    double x;
-    double r1;
-    double r2;
-    for (int X = min_input; X <= max_input; ++X) {
-        x = ((double)X) / ((double)(1 << SF_ATAN_IN));
-        r1 = atan(x);
-        r2 = ((double)(arctan(X) * ((double)M_PI))) / ((double)(1 << SF_ATAN_OUT)) / ((double)(1 << SF_ATAN_OUT));
-        printf("atan(x = %f) = %f, arctan(X = %d) * M_PI/ (2^14) = %f, error = %f\n", x, r1, X, r2, fabs(r1 - r2));
-    }
-}
+    // 16-bit floating point input limits, for quadrants I and IV only (quadrants II and III are unnecessary in Jacobi method)
+    double min_x = 0;
+    double max_x = pow(2, 16 - 1) - 1;
+    double min_y = -pow(2, 16 - 1);
+    double max_y = pow(2, 16 - 1) - 1;
+    double x_inc = (max_x - min_x) / 16;
+    double y_inc = (max_y - min_y) / 16;
 
-void arctan_tests_int(void) {
-    /*int min_element = -8192,
-        max_element = 8192;
-    // ^^^ above is only true for the first iteration of sweep 1 ^^^ */
-    
-    // max unscaled value of matrix elements is (2^31)/(2^SF_ATAN_IN)
-    int min_element = -(1 << (32-SF_ATAN_IN)),
-        max_element = 1 << (32-SF_ATAN_IN);   
-       
-    // max input magnitude is 2^31
-    int min_input = 0x80000000,
-        max_input = 0x7FFFFFFF;
-        
-    printf("input to arctan(): min is %d, max is %d\n", min_input, max_input);
-    
-    // test minimum input
-    int output = arctan(min_input); // function being tested
-    double actual = atan2(min_element,1);
-    int want = actual / M_PI * pow(2,SF_ATAN_OUT);    //-pi/2, scaled
-    
-    printf("input: %d, output = %d, wanted: %d\n", min_input, output, want);
-    
-    double error = fabs((double)(output - want)/want) * 100;
-    printf("percent error is %f\n", error);
-     
-    if (error > MAX_ERROR_ATAN) {
-        printf("integer arctan test failed for minimum input\n");   
-        return;      
-    }
-    
-    // test maximum input
-    output = arctan(max_input); // function being tested
-    actual = atan2(max_element,1);
-    want = actual / M_PI * pow(2,SF_ATAN_OUT);    //pi/2, scaled
-    
-    printf("input: %d, output = %d, wanted: %d\n", max_input, output, want);
-        
-    error = fabs((double)(output - want)/want) * 100;
-    printf("percent error is %f\n", error);
-        
-    if (error > MAX_ERROR_ATAN) {
-        printf("integer arctan test failed for maximum input\n");         
-        return;
-    }
-    
-    int nloops = 500,
-        range = 5;
-    for (int i=0; i<nloops; i++) {
-        double loopf = 2 * (double)i/(nloops) - 1;
-        //printf("loopf is: %f\n", loopf);
-        // regular test vector
-        //test_vector[i] = M_PI*loopf;
-        int scaled_input = loopf * (range << SF_ATAN_IN);
-        output = arctan(scaled_input);    // function being tested
-        // test vector from -pi to pi, scaled
-        //test_vector_scaled[i] = loopf*pow(2,SF_ATAN_IN);
-        double input = loopf * range;
-        actual = atan(input);
-        want = actual / M_PI * pow(2,SF_ATAN_OUT);
-        
-        printf("\ninput: %d(%f), output = %d, wanted: %d(%f)\n", scaled_input, input, output, want, actual);
-        
-        error = fabs((double)(output - want)/want) * 100;
-        printf("percent error is %f\n", error);
-            
-        if (error > MAX_ERROR_ATAN) {
-            printf("integer arctan test failed for input: %d(%f rads)\n\n", scaled_input, input);         
-            return;
+    for (double x = min_x; x < max_x; x += x_inc) {
+        if (x != 0) {
+            for (double y = min_y; y < max_y; y += y_inc) {
+                int Y = y * pow(2, SF_ATAN_IN);
+                int X = x * pow(2, SF_ATAN_IN);
+                //printf("Y = %d, X = %d\n", Y, X);
+                double result = ((double)arctan2(Y, X)) / pow(2, SF_ATAN_OUT);
+                double expected = (atan(y/x));
+                double error_percent = 100 * ((result - expected) / expected);
+                if (fabs(error_percent) > 10 && fabs(result - expected) > 0.001) {
+                    printf("        TEST FAIL\n----------------------\n");
+                    break;
+                }
+                //printf("y = %f, x = %f, y/x = %f, \n      our unscaled result: %f\n expected unscaled result: %f\n percent error: %f\n------------------\n", y, x, y/x, (double)result, expected, error_percent);
+            }
         }
-        
     }
-    
-    printf("integer arctan test passed\n");
-    return;
+    printf("\n----------------\narctan tests pass for 16 bit unscaled x and y inputs, with arctan output range for quadrants I and IV only.\n----------------\n");
 }
 
 void lin_cos_tests() {
@@ -133,15 +72,17 @@ void lin_sin_tests() {
     printf("lin_sin max error: %f at %f rads, avg error: %f\n", max_error, max_error_angle, total_error/NPOINTS);
 }
 
-int main(void) {
-    //generate_arctan_table_output();
+int main() {
+    //int n = -3;
+    //int d = 2; 
+    //int div = divide_by_subraction(n << SF_ATAN_IN, d << SF_ATAN_IN);
+    //int expected = (int)((n << SF_ATAN_IN) / d);
+    //printf("div = %d, expected = %d\n", div, expected);
+    //generate_linear_approximation(-1.0, 1.0, 0.1);
     arctan_tests();
-   //printf("---------\n");
-   arctan_tests_int();
-    //printf("---------\n");
- //   
-    // generate test vectors for sin/cos
-   /* for (int i=0; i<NPOINTS; i++) {
+   
+ /*   // generate test vectors for sin/cos
+    for (int i=0; i<NPOINTS; i++) {
         double loopf = 2 * (double)i/(NPOINTS) - 1;
         //printf("loopf is: %f\n", loopf);
         // regular test vector
@@ -149,12 +90,12 @@ int main(void) {
         // test vector from -pi to pi, scaled
         test_vector_scaled[i] = loopf*pow(2,SF_ATAN_OUT);
         //printf("test vector: %f, scaled: %d\n", test_vector[i], test_vector_scaled[i]);
-    }  */
+    }  
 //
  //   // run sin/cos tests
- //   lin_cos_tests();
-   // printf("---------\n");
-   // lin_sin_tests();
+   lin_cos_tests();
+    printf("---------\n");
+    lin_sin_tests();*/
  //   //printf("---------\n");
     //return 0;
 }
